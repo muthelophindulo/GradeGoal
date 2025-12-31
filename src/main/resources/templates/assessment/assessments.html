@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessments - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px; /* Space for fixed header */
+        }
+        
+        /* Fixed Header - ALWAYS STICKY */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Page Header */
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .page-title h2 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .page-title p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+        
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .stats-icon.completed {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+        }
+        
+        .stats-icon.pending {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .stats-icon.average {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stats-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-text {
+            color: #6c757d;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        /* Assessment Cards */
+        .assessment-card {
+            transition: all 0.3s ease;
+            border: none;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .assessment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .assessment-progress {
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin: 15px 0 10px;
+        }
+        
+        .assessment-progress-bar {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .assessment-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        
+        .status-overdue {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        
+        .status-achieved {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-below-target {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-today {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #adb5bd;
+            margin-bottom: 25px;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Border dashed for add card */
+        .border-dashed {
+            border: 2px dashed #dee2e6 !important;
+        }
+        
+        /* Date badge */
+        .date-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        /* Weight badge */
+        .weight-badge {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        /* RESPONSIVE BREAKPOINTS */
+        
+        /* Tablets and small desktops (lg and below) */
+        @media (max-width: 1199.98px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .stats-number {
+                font-size: 1.6rem;
+            }
+        }
+        
+        /* Mobile and tablets (md and below) */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-profile .user-details {
+                display: none;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+        
+        /* Small mobile devices (sm and below) */
+        @media (max-width: 767.98px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .page-title h2 {
+                font-size: 1.4rem;
+            }
+            
+            .stats-card, .assessment-card {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            .footer {
+                padding: 15px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Extra small mobile devices (xs) */
+        @media (max-width: 575.98px) {
+            .header-left {
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .menu-toggle {
+                font-size: 1.3rem;
+            }
+            
+            .page-title h2 {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .empty-state {
+                padding: 40px 15px;
+            }
+            
+            .empty-state i {
+                font-size: 3rem;
+            }
+            
+            .empty-state h4 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-menu">
+        <!-- Main Menu -->
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/list}">
+                    <i class="bi bi-journal-bookmark"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/assessment/list}">
+                    <i class="bi bi-clipboard-data"></i> Assessments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/grades}">
+                    <i class="bi bi-bar-chart-line"></i> Grades
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/new}">
+                    <i class="bi bi-plus-circle"></i> Add Course
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/new}">
+                    <i class="bi bi-clipboard-plus"></i> Add Assessment
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/profile}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="header" id="header">
+    <div class="header-left">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h1>Assessments</h1>
+    </div>
+    <div class="user-profile" onclick="location.href='/user/profile'">
+        <div class="user-details d-none d-md-block">
+            <h6 th:text="${user.name}">User Name</h6>
+            <small th:text="${user.studentNo}">Student No</small>
+            <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
+        </div>
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+        </div>
+    </div>
+</div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h2 th:text="${title}">All Assessments</h2>
+                <p>Manage your assessments</p>
+            </div>
+            <a th:href="@{/assessment/new}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add Assessment
+            </a>
+        </div>
+
+        <!-- Filters -->
+        <div class="stats-card mb-4">
+            <h5 class="mb-3">Filter Assessments</h5>
+            <form th:action="@{/assessment/list}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label">Course</label>
+                    <select name="courseCode" class="form-select">
+                        <option value="">All Courses</option>
+                        <option th:each="course : ${courses}" 
+                                th:value="${course.code}"
+                                th:text="${course.name + ' (' + course.code + ')'}"
+                                th:selected="${param.courseCode == course.code}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="completed" th:selected="${param.status == 'completed'}">Completed</option>
+                        <option value="pending" th:selected="${param.status == 'pending'}">Pending</option>
+                        <option value="overdue" th:selected="${param.status == 'overdue'}">Overdue</option>
+                        <option value="achieved" th:selected="${param.status == 'achieved'}">Achieved Target</option>
+                        <option value="below_target" th:selected="${param.status == 'below_target'}">Below Target</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-filter me-1"></i>Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon completed">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <div class="stats-number" th:text="${completedCount}">0</div>
+                    <div class="stats-text">Completed</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon pending">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="stats-number" th:text="${pendingCount}">0</div>
+                    <div class="stats-text">Pending</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="stats-card">
+                    <div class="stats-icon average">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+                    <div class="stats-number" th:text="${averageAchievement} + '%'">0%</div>
+                    <div class="stats-text">Avg. Achievement</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Cards View -->
+        <div class="row g-3 g-md-4 mb-5" id="cardView">
+            <div th:each="assessment : ${assessments}" 
+                 th:with="status=${assessment.actualMark != null ? (assessment.actualMark >= assessment.targetMark ? 'achieved' : 'below_target') : (assessment.date.isBefore(#temporals.createToday()) ? 'overdue' : (assessment.date.isEqual(#temporals.createToday()) ? 'today' : 'pending'))}"
+                 class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card assessment-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div style="flex: 1; min-width: 0;">
+                                <h5 class="card-title mb-1 text-truncate" th:text="${assessment.name}">Assessment Name</h5>
+                                <p class="card-text text-muted mb-2" th:text="${assessment.course?.name}">Course Name</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Date and Weight -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <small class="text-muted">Due Date:</small>
+                                <div class="date-badge d-inline-block ms-2">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(assessment.date, 'dd MMM')}"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <small class="text-muted">Weight:</small>
+                                <div class="weight-badge d-inline-block ms-2">
+                                    <i class="bi bi-percent me-1"></i>
+                                    <span th:text="${assessment.weigh} + '%'"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div th:if="${assessment.actualMark != null}" class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small>Progress</small>
+                                <small th:text="${assessment.actualMark} + '%'"></small>
+                            </div>
+                            <div class="assessment-progress">
+                                <div class="assessment-progress-bar" 
+                                     th:style="'width: ' + ${assessment.actualMark} + '%; background: ' + ${assessment.actualMark >= assessment.targetMark ? 'linear-gradient(90deg, #4ecdc4, #44a08d)' : 'linear-gradient(90deg, #ff9a76, #ff6b6b)'}"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Assessment Stats -->
+                        <div class="assessment-stats">
+                            <div>
+                                <small>Target</small>
+                                <div class="fw-bold" th:text="${assessment.targetMark} + '%'"></div>
+                            </div>
+                            <div>
+                                <small>Actual</small>
+                                <div class="fw-bold" 
+                                     th:if="${assessment.actualMark != null}" 
+                                     th:text="${assessment.actualMark} + '%'"
+                                     th:classappend="${assessment.actualMark >= assessment.targetMark} ? 'text-success' : 'text-warning'">
+                                </div>
+                                <div class="fw-bold text-muted" th:unless="${assessment.actualMark != null}">--</div>
+                            </div>
+                            <div>
+                                <small>Difference</small>
+                                <div class="fw-bold"
+                                     th:if="${assessment.actualMark != null}"
+                                     th:text="${#numbers.formatDecimal(assessment.actualMark - assessment.targetMark, 1, 1)} + '%'"
+                                     th:classappend="${(assessment.actualMark - assessment.targetMark) >= 0} ? 'text-success' : 'text-danger'">
+                                </div>
+                                <div class="fw-bold text-muted" th:unless="${assessment.actualMark != null}">--</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <div class="mt-3">
+                            <span th:switch="${status}" class="status-badge">
+                                <span th:case="'achieved'" class="status-achieved">
+                                    <i class="bi bi-check-circle me-1"></i>Achieved
+                                </span>
+                                <span th:case="'below_target'" class="status-below-target">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Below Target
+                                </span>
+                                <span th:case="'overdue'" class="status-overdue">
+                                    <i class="bi bi-clock me-1"></i>Overdue
+                                </span>
+                                <span th:case="'today'" class="status-today">
+                                    <i class="bi bi-calendar-check me-1"></i>Today
+                                </span>
+                                <span th:case="'pending'" class="status-pending">
+                                    <i class="bi bi-clock-history me-1"></i>Pending
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a th:href="@{/assessment/edit/{id}(id=${assessment.id})}" 
+                                       class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="bi bi-pencil"></i>
+                                        <span class="d-none d-sm-inline"> Edit</span>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a th:href="@{/assessment/delete/{id}(id=${assessment.id})}" 
+                                       class="btn btn-sm btn-outline-danger w-100"
+                                       onclick="return confirm('Delete this assessment?')">
+                                        <i class="bi bi-trash"></i>
+                                        <span class="d-none d-sm-inline"> Delete</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Assessment Card -->
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card assessment-card border-dashed h-100" style="background: #f8f9fa;">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-plus-circle" style="font-size: 3rem; color: #6c757d;"></i>
+                        </div>
+                        <h5 class="mb-2">Add New Assessment</h5>
+                        <p class="text-muted mb-3" style="font-size: 0.9rem;">Add an assessment to track your progress</p>
+                        <a th:href="@{/assessment/new}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Add Assessment
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(assessments)}" class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-clipboard-x text-muted"></i>
+                    <h4>No Assessments Found</h4>
+                    <p th:if="${param.courseCode != null or param.status != null}">
+                        No assessments match your filter criteria.
+                    </p>
+                    <p th:unless="${param.courseCode != null or param.status != null}">
+                        Add your first assessment to get started.
+                    </p>
+                    <a th:href="@{/assessment/new}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Add Your First Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            <p class="mb-0" th:text="'Logged in as: ' + ${user.name}"></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Progress bar animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.assessment-progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // Highlight today's assessments
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            
+            document.querySelectorAll('.assessment-card').forEach(card => {
+                const dateBadge = card.querySelector('.date-badge');
+                if (dateBadge) {
+                    const dateText = dateBadge.textContent.trim();
+                    // You could add specific styling for today's assessments
+                }
+            });
+        });
+        
+        // Filter form submission enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.querySelector('form');
+            const courseSelect = filterForm.querySelector('select[name="courseCode"]');
+            const statusSelect = filterForm.querySelector('select[name="status"]');
+            
+            // Reset filters button
+            const resetBtn = document.createElement('button');
+            resetBtn.type = 'button';
+            resetBtn.className = 'btn btn-outline-secondary w-100 mt-2';
+            resetBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters';
+            resetBtn.addEventListener('click', function() {
+                courseSelect.value = '';
+                statusSelect.value = '';
+                filterForm.submit();
+            });
+            
+            filterForm.appendChild(resetBtn);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.name} + ' - GradeGoal'">GradeGoal Dashboard</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px; /* Space for fixed header */
+        }
+        
+        /* Fixed Header - ALWAYS STICKY */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-text h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+            margin-bottom: 0;
+            font-size: 1rem;
+        }
+        
+        .welcome-icon {
+            font-size: 3.5rem;
+            opacity: 0.2;
+        }
+        
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            height: 100%;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .stats-icon.course {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stats-icon.assessment {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+        }
+        
+        .stats-icon.grade {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .stats-icon.degree {
+            background: rgba(58, 12, 163, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .stats-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-text {
+            color: #6c757d;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .stats-subtext {
+            color: #adb5bd;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Compact Goals Tracker Widget */
+        .goals-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            margin-bottom: 30px;
+        }
+        
+        .goals-card h5 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .goal-item {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .goal-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .goal-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .goal-label {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        
+        .goal-value {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+        
+        .goal-progress {
+            height: 6px;
+            border-radius: 10px;
+            background: #e0e0e0;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .goal-progress-bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .goal-subtext {
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Top Courses Widget */
+        .top-courses-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            margin-bottom: 30px;
+        }
+        
+        .top-courses-card h5 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .course-rank-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .course-rank-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .course-rank-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .rank-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #ffd166, #f9c74f); }
+        .rank-2 { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
+        .rank-3 { background: linear-gradient(135deg, #a0c4ff, #8ac6ff); }
+        .rank-other { background: linear-gradient(135deg, #adb5bd, #6c757d); }
+        
+        .course-info {
+            flex: 1;
+            min-width: 0; /* Important for text truncation */
+        }
+        
+        .course-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .course-code {
+            font-size: 0.85rem;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .course-grade {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        
+        /* Recent Grades Card */
+        .grades-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            margin-bottom: 30px;
+        }
+        
+        .grades-card h5 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .grade-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .grade-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .grade-item:hover {
+            background: #e9ecef;
+        }
+        
+        .grade-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .grade-icon.excellent {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+        
+        .grade-icon.good {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        }
+        
+        .grade-icon.average {
+            background: linear-gradient(135deg, #ffd166, #f9c74f);
+        }
+        
+        .grade-icon.poor {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+        
+        .grade-details {
+            flex: 1;
+            min-width: 0; /* Important for text truncation */
+        }
+        
+        .grade-details h6 {
+            margin-bottom: 5px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .grade-course {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .grade-marks {
+            text-align: right;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        
+        .grade-percentage {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .grade-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        /* Upcoming Deadlines */
+        .deadlines-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            margin-bottom: 30px;
+        }
+        
+        .deadlines-card h5 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .deadline-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .deadline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .deadline-item:hover {
+            background: #e9ecef;
+        }
+        
+        .deadline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .deadline-icon.exam {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+        
+        .deadline-icon.assignment {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+        
+        .deadline-icon.project {
+            background: linear-gradient(135deg, #ffd166, #f9c74f);
+        }
+        
+        .deadline-details {
+            flex: 1;
+            min-width: 0; /* Important for text truncation */
+        }
+        
+        .deadline-details h6 {
+            margin-bottom: 5px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .deadline-course {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .deadline-time {
+            text-align: right;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        
+        .deadline-date {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .deadline-days {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #adb5bd;
+        }
+        
+        /* RESPONSIVE BREAKPOINTS */
+        
+        /* Large desktops (xl and above) */
+        @media (min-width: 1200px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .welcome-text h2 {
+                font-size: 2rem;
+            }
+            .stats-number {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* Tablets and small desktops (lg) */
+        @media (max-width: 1199.98px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            .welcome-text h2 {
+                font-size: 1.6rem;
+            }
+            .welcome-icon {
+                font-size: 3rem;
+            }
+            .stats-number {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Mobile and tablets (md and below) */
+        @media (max-width: 991.98px) {
+            /* Header is ALWAYS fixed on mobile */
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+                /* Stay fixed at top */
+                position: fixed;
+                top: 0;
+                z-index: 999;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-profile .user-details {
+                display: none;
+            }
+            
+            /* Adjust body padding for fixed header */
+            body {
+                padding-top: 75px; /* Adjust for mobile header height */
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .welcome-banner {
+                padding: 20px;
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+                margin-top: 10px;
+            }
+            
+            .welcome-text h2 {
+                font-size: 1.5rem;
+            }
+            
+            .welcome-icon {
+                font-size: 2.5rem;
+            }
+            
+            .stats-card, .goals-card, .top-courses-card, 
+            .grades-card, .deadlines-card {
+                padding: 20px;
+            }
+            
+            .stats-number {
+                font-size: 1.8rem;
+            }
+            
+            .goal-item, .course-rank-item, .grade-item, .deadline-item {
+                padding: 12px;
+            }
+        }
+        
+        /* Small mobile devices (sm and below) */
+        @media (max-width: 767.98px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .welcome-banner {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .welcome-text h2 {
+                font-size: 1.3rem;
+            }
+            
+            .welcome-text p {
+                font-size: 0.9rem;
+            }
+            
+            .welcome-icon {
+                font-size: 2rem;
+            }
+            
+            .stats-card, .goals-card, .top-courses-card, 
+            .grades-card, .deadlines-card {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            .stats-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+            
+            .stats-number {
+                font-size: 1.6rem;
+            }
+            
+            .stats-text {
+                font-size: 1rem;
+            }
+            
+            h5 {
+                font-size: 1.1rem;
+            }
+            
+            .goal-item, .course-rank-item, .grade-item, .deadline-item {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .rank-number {
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .course-grade {
+                font-size: 1rem;
+            }
+            
+            .grade-icon, .deadline-icon {
+                width: 35px;
+                height: 35px;
+                margin-right: 10px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Extra small mobile devices (xs) */
+        @media (max-width: 575.98px) {
+            .header-left {
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .menu-toggle {
+                font-size: 1.3rem;
+            }
+            
+            .welcome-banner {
+                padding: 12px;
+            }
+            
+            .welcome-text h2 {
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+            
+            .welcome-text p {
+                font-size: 0.85rem;
+            }
+            
+            .stats-number {
+                font-size: 1.4rem;
+            }
+            
+            .stats-text {
+                font-size: 0.9rem;
+            }
+            
+            .goal-value, .course-grade, .grade-percentage, .deadline-date {
+                font-size: 0.9rem;
+            }
+            
+            .goal-subtext, .course-code, .grade-course, .deadline-course,
+            .grade-date, .deadline-days {
+                font-size: 0.8rem;
+            }
+            
+            .course-name, .deadline-details h6, .grade-details h6 {
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                padding: 15px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Very small mobile devices */
+        @media (max-width: 375px) {
+            body {
+                padding-top: 70px; /* Adjust for very small header */
+            }
+            
+            .stats-card, .goals-card, .top-courses-card, 
+            .grades-card, .deadlines-card {
+                padding: 12px;
+            }
+            
+            .stats-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            
+            .stats-number {
+                font-size: 1.3rem;
+            }
+            
+            .goal-item, .course-rank-item, .grade-item, .deadline-item {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <!-- Main Menu -->
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>GradeGoal</h1>
+        </div>
+        <div class="user-profile" onclick="location.href='/user/profile'">
+            <div class="user-details d-none d-md-block">
+                <h6 th:text="${user.name}">John Doe</h6>
+                <small th:text="${user.studentNo}">S001</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h2 th:text="'Welcome, ' + ${user.name} + '!'">Welcome John!</h2>
+                <p th:text="'Track your academic progress in ' + ${user.degree?.name}">Track your academic progress in Computer Science</p>
+            </div>
+            <div class="welcome-icon">
+                <i class="bi bi-trophy"></i>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-3 g-md-4 mb-3 mb-md-4">
+            <div class="col-6 col-lg-3">
+                <a th:href="@{/course/list}" class="stats-card">
+                    <div class="stats-icon course">
+                        <i class="bi bi-journal-bookmark"></i>
+                    </div>
+                    <div class="stats-number" th:text="${courseCount}">5</div>
+                    <div class="stats-text">Active Courses</div>
+                    <div class="stats-subtext">Click to view all</div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <a th:href="@{/assessment/list}" class="stats-card">
+                    <div class="stats-icon assessment">
+                        <i class="bi bi-clipboard-data"></i>
+                    </div>
+                    <div class="stats-number" th:text="${assessmentCount}">12</div>
+                    <div class="stats-text">Assessments</div>
+                    <div class="stats-subtext" th:text="${pendingCount} + ' pending'">3 pending</div>
+                </a>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon grade">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="stats-number" th:text="${averageGrade} + '%'">78.5%</div>
+                    <div class="stats-text">Average Grade</div>
+                    <div class="stats-text">Annual</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stats-card">
+                    <div class="stats-icon degree">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <div class="stats-text">Current GPA</div>
+                    <div class="stats-number" th:text="${gpa}">3.45</div>
+                    <div class="stats-subtext" th:text="${user.degree?.name}">Computer Science</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid - REORDERED AS REQUESTED -->
+        <div class="row g-3 g-md-4">
+            <!-- Left Column: Top Courses FIRST, then Academic Goals -->
+            <div class="col-lg-4">
+                <!-- 1. Top Courses Widget (FIRST) -->
+                <div class="top-courses-card">
+                    <h5><i class="bi bi-trophy"></i> Top Courses</h5>
+                    
+                    <div th:each="course,stat : ${courses}" class="course-rank-item">
+                        <div class="rank-number rank-1" th:class=" 'rank-number rank-'+${stat.count} " th:text="${stat.count}">1</div>
+                        <div class="course-info">
+                            <div class="course-name" th:text="${course.name}">Data Structures & Algorithms</div>
+                            <div class="course-code" th:text="${course.code}">CS201</div>
+                        </div>
+                        <div class="course-grade" th:text="${course.actualMark}">92%</div>
+                    </div>
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <a th:href="@{/course/courses}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i>View All Courses
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 2. Academic Goals Widget (SECOND) -->
+                <div class="goals-card">
+                    <h5><i class="bi bi-bullseye"></i> Academic Goals</h5>
+                    
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <span class="goal-label">Semester GPA</span>
+                            <span class="goal-value">3.7 / 4.0</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-bar" style="width: 82%; background: linear-gradient(90deg, #4361ee, #3a0ca3);"></div>
+                        </div>
+                        <div class="goal-subtext">
+                            <span>Current: 3.45</span>
+                            <span>Need: +0.25</span>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <span class="goal-label">Course Progress</span>
+                            <span class="goal-value">3 / 5</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-bar" style="width: 60%; background: linear-gradient(90deg, #4cc9f0, #2a9d8f);"></div>
+                        </div>
+                        <div class="goal-subtext">
+                            <span>2 courses left</span>
+                            <span>60% complete</span>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <span class="goal-label">Grade Target</span>
+                            <span class="goal-value">78% / 85%</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-bar" style="width: 91%; background: linear-gradient(90deg, #f72585, #ff6b6b);"></div>
+                        </div>
+                        <div class="goal-subtext">
+                            <span>+7% needed</span>
+                            <span>91% to target</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Set New Goal
+                        </button>
+                    </div>
+                </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            <p class="mb-0" th:text="'Logged in as: ' + ${user.name}">Logged in as: John Doe</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when sidebar is open
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Stats animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const statsNumbers = document.querySelectorAll('.stats-number');
+            
+            statsNumbers.forEach(number => {
+                const text = number.textContent;
+                if (text.includes('%') || text.includes('.')) {
+                    const finalValue = parseFloat(text);
+                    let startValue = 0;
+                    const duration = 1500;
+                    const increment = finalValue / (duration / 16);
+                    
+                    const timer = setInterval(() => {
+                        startValue += increment;
+                        if (startValue >= finalValue) {
+                            number.textContent = text;
+                            clearInterval(timer);
+                        } else {
+                            number.textContent = text.includes('.') 
+                                ? startValue.toFixed(2) 
+                                : Math.floor(startValue);
+                        }
+                    }, 16);
+                }
+            });
+        });
+        
+        // Add scroll effect to header on desktop
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.innerWidth > 992) {
+                if (window.scrollY > 10) {
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                    header.style.padding = '15px 30px';
+                } else {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                    header.style.padding = '20px 30px';
+                }
+            }
+        });
+        
+        // Add click effect to cards
+        document.querySelectorAll('.stats-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!this.getAttribute('href')) {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+        
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                // Close sidebar if open on mobile when resizing to desktop
+                if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            }, 250);
+        });
+        
+        // Goals tracker dynamic content adjustment
+        function adjustGoalItems() {
+            const goalItems = document.querySelectorAll('.goal-item');
+            goalItems.forEach(item => {
+                // Check if content is overflowing
+                if (item.scrollHeight > item.clientHeight) {
+                    // Reduce padding for tight fit
+                    item.style.padding = '8px 12px';
+                    const subtext = item.querySelector('.goal-subtext');
+                    if (subtext) {
+                        subtext.style.fontSize = '0.75rem';
+                    }
+                }
+            });
+        }
+        
+        // Run adjustment on load and resize
+        window.addEventListener('load', adjustGoalItems);
+        window.addEventListener('resize', adjustGoalItems);
+        
+        // Ensure header stays fixed on mobile
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            // Header is always fixed, just update styling
+            if (window.scrollY > 10) {
+                header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+            }
+        });
+    </script>
+</body>
+</html>

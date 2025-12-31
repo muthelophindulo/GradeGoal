@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Header Section */
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo-text h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        
+        .logo-text p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            margin: 0;
+            text-align: left;
+        }
+        
+        /* Body Section */
+        .login-body {
+            padding: 40px 35px 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            z-index: 5;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 1.1rem;
+            z-index: 5;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Remember Me & Forgot Password */
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        /* Login Button */
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        /* Create Account Link */
+        .create-account {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .create-account-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        
+        .create-account-link:hover {
+            color: var(--secondary-color);
+            background: rgba(67, 97, 238, 0.05);
+            text-decoration: none;
+        }
+        
+        /* Footer Section */
+        .login-footer {
+            padding: 20px 35px;
+            text-align: center;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .copyright {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: none;
+            font-size: 0.95rem;
+        }
+        
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-success {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+            border-left: 4px solid #198754;
+        }
+        
+        /* Forgot Password Modal */
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 25px;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 576px) {
+            .login-container {
+                border-radius: 15px;
+            }
+            
+            .login-header {
+                padding: 30px 20px 25px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .logo-text h1,
+            .logo-text p {
+                text-align: center;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.8rem;
+            }
+            
+            .login-body {
+                padding: 30px 20px 25px;
+            }
+            
+            .login-footer {
+                padding: 20px;
+            }
+            
+            .form-control {
+                padding: 14px 14px 14px 45px;
+                font-size: 0.95rem;
+            }
+            
+            .btn-login {
+                padding: 14px;
+                font-size: 1rem;
+            }
+            
+            .login-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.6rem;
+            }
+            
+            .login-header {
+                padding: 25px 15px 20px;
+            }
+            
+            .login-body {
+                padding: 25px 15px 20px;
+            }
+        }
+        
+        /* Loading Animation */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading .spinner {
+            display: inline-block;
+        }
+        
+        .loading .btn-text {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Header -->
+        <div class="login-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>GradeGoal</h1>
+                    <p>Track Your Academic Journey</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="login-body">
+            <!-- Error/Success Messages -->
+            <div th:if="${param.error}" class="alert alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                Invalid student number or password. Please try again.
+            </div>
+            
+            <div th:if="${param.logout}" class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>
+                You have been successfully logged out.
+            </div>
+            
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post" id="loginForm">
+                <!-- Student Number -->
+                <div class="form-group">
+                    <label class="form-label" for="studentNo">
+                        <i class="bi bi-person-vcard me-1"></i> Student Number
+                    </label>
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <input type="text" 
+                               id="studentNo" 
+                               name="username" 
+                               class="form-control" 
+                               placeholder="Enter your student number"
+                               required
+                               autocomplete="username"
+                               th:value="${param.username}">
+                    </div>
+                </div>
+                
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="bi bi-lock me-1"></i> Password
+                    </label>
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="bi bi-key"></i>
+                        </div>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Enter your password"
+                               required
+                               autocomplete="current-password">
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Remember Me & Forgot Password -->
+                <div class="login-options">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="forgot-password" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                        <i class="bi bi-question-circle me-1"></i>Forgot Password?
+                    </a>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-text">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </span>
+                    <span class="spinner"></span>
+                </button>
+                
+                <!-- Create Account Link -->
+                <div class="create-account">
+
+                    <a th:href="@{/register}" class="create-account-link">
+                        <i class="bi bi-person-plus"></i>
+                        Create New Account
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Footer -->
+        <div class="login-footer">
+            <p class="copyright">
+                © 2024 GradeGoal Academic Tracker. All rights reserved.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-key me-2"></i>Reset Password
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-4">Enter your student number to receive a password reset link.</p>
+                    <form id="forgotPasswordForm">
+                        <div class="mb-3">
+                            <label for="resetStudentNo" class="form-label">Student Number</label>
+                            <input type="text" class="form-control" id="resetStudentNo" 
+                                   placeholder="Enter your student number" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-reset">
+                                <i class="bi bi-send me-2"></i>Send Reset Link
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            You will receive an email with reset instructions.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle icon
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        });
+        
+        // Form submission loading state
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        loginForm.addEventListener('submit', function() {
+            // Validate form
+            const studentNo = document.getElementById('studentNo').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!studentNo || !password) {
+                return; // Let browser handle validation
+            }
+            
+            // Show loading state
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            
+            // Simulate network delay for demo (remove in production)
+            setTimeout(() => {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }, 2000);
+        });
+        
+        // Forgot password form
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentNo = document.getElementById('resetStudentNo').value.trim();
+            
+            if (!studentNo) {
+                alert('Please enter your student number');
+                return;
+            }
+            
+            // Show success message
+            alert(`Password reset link has been sent for student number: ${studentNo}\n\n(Note: This is a demo. In production, this would send an email.)`);
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+            modal.hide();
+            
+            // Reset form
+            forgotPasswordForm.reset();
+        });
+        
+        // Auto-focus on first input
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentNoInput = document.getElementById('studentNo');
+            if (studentNoInput) {
+                studentNoInput.focus();
+            }
+        });
+        
+        // Remember me functionality
+        window.addEventListener('load', function() {
+            const rememberCheckbox = document.getElementById('remember');
+            const storedStudentNo = localStorage.getItem('rememberedStudentNo');
+            const studentNoInput = document.getElementById('studentNo');
+            
+            if (storedStudentNo && rememberCheckbox && studentNoInput) {
+                studentNoInput.value = storedStudentNo;
+                rememberCheckbox.checked = true;
+            }
+        });
+        
+        // Save student number if remember me is checked
+        loginForm.addEventListener('submit', function() {
+            const rememberCheckbox = document.getElementById('remember');
+            const studentNoInput = document.getElementById('studentNo');
+            
+            if (rememberCheckbox && rememberCheckbox.checked && studentNoInput) {
+                localStorage.setItem('rememberedStudentNo', studentNoInput.value);
+            } else {
+                localStorage.removeItem('rememberedStudentNo');
+            }
+        });
+        
+        // Modal close handler
+        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+        forgotPasswordModal.addEventListener('hidden.bs.modal', function() {
+            forgotPasswordForm.reset();
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const fadeAlert = new bootstrap.Alert(alert);
+                fadeAlert.close();
+            });
+        }, 5000);
+        
+        // Input validation for student number
+        const studentNoInput = document.getElementById('studentNo');
+        if (studentNoInput) {
+            studentNoInput.addEventListener('input', function() {
+                const value = this.value;
+                // Allow only alphanumeric and common student number formats
+                this.value = value.replace(/[^a-zA-Z0-9\-_]/g, '');
+            });
+        }
+        
+        // Enter key to submit form
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.matches('#studentNo, #password')) {
+                // Allow default form submission
+            }
+        });
+    </script>
+</body>
+</html>

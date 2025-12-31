@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oops! - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px;
+        }
+        
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Error Content */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .error-illustration {
+            max-width: 500px;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .error-svg {
+            width: 100%;
+            height: 100%;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-color), var(--warning-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: -20px;
+            line-height: 1;
+        }
+        
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .error-details {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 600px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .error-details h6 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .error-details pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-bottom: 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn-error {
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-error {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary-error:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-error {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .btn-secondary-error:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        /* Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .bounce {
+            animation: bounce 1s ease-in-out infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .error-code {
+                font-size: 6rem;
+            }
+            
+            .error-title {
+                font-size: 2rem;
+            }
+            
+            .error-message {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .error-code {
+                font-size: 5rem;
+            }
+            
+            .error-title {
+                font-size: 1.8rem;
+            }
+            
+            .error-illustration {
+                height: 250px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .btn-error {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .error-code {
+                font-size: 4rem;
+            }
+            
+            .error-title {
+                font-size: 1.5rem;
+            }
+            
+            .error-message {
+                font-size: 1rem;
+            }
+            
+            .error-illustration {
+                height: 200px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>GradeGoal</h1>
+        </div>
+        <div class="header-right">
+            <a th:href="@{/dashboard}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="error-container">
+            <!-- Dynamic Error Code -->
+            <div class="error-code" id="errorCode" th:text="${status} ?: '500'">404</div>
+            
+            <!-- Dynamic Illustration -->
+            <div class="error-illustration" id="errorIllustration">
+                <!-- SVG will be inserted by JavaScript -->
+            </div>
+            
+            <!-- Dynamic Title -->
+            <h1 class="error-title" id="errorTitle">Page Not Found</h1>
+            
+            <!-- Dynamic Message -->
+            <p class="error-message" id="errorMessage">
+                Oops! The page you're looking for seems to have disappeared into the digital void.
+            </p>
+            
+            <!-- Error Details (only shown for 500 errors or when debugging) -->
+            <div class="error-details" id="errorDetails" style="display: none;">
+                <h6>Error Details:</h6>
+                <pre id="errorDetailsContent"></pre>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/dashboard}" class="btn btn-error btn-primary-error">
+                    <i class="bi bi-house-door"></i> Go to Dashboard
+                </a>
+                <button onclick="history.back()" class="btn btn-error btn-secondary-error">
+                    <i class="bi bi-arrow-left"></i> Go Back
+                </button>
+                <button onclick="location.reload()" class="btn btn-error btn-secondary-error">
+                    <i class="bi bi-arrow-clockwise"></i> Reload Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Get error details from Thymeleaf or URL
+        const errorStatus = document.getElementById('errorCode').textContent;
+        const errorPath = window.location.pathname;
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get('message') || "An unexpected error occurred";
+        
+        // Dynamic error handling
+        const errorConfigs = {
+            '400': {
+                title: "Bad Request",
+                message: "Your request couldn't be processed. Please check your input and try again.",
+                animation: "shake"
+            },
+            '401': {
+                title: "Unauthorized Access",
+                message: "You need to log in to access this page. Please sign in and try again.",
+                animation: "bounce"
+            },
+            '403': {
+                title: "Access Denied",
+                message: "You don't have permission to access this page. Contact your administrator if you believe this is an error.",
+                animation: "shake"
+            },
+            '404': {
+                title: "Page Not Found",
+                message: "The page you're looking for doesn't exist or has been moved. Check the URL or navigate from the dashboard.",
+                animation: "float"
+            },
+            '405': {
+                title: "Method Not Allowed",
+                message: "The request method is not supported for this resource.",
+                animation: "shake"
+            },
+            '408': {
+                title: "Request Timeout",
+                message: "The server timed out waiting for your request. Please try again.",
+                animation: "bounce"
+            },
+            '429': {
+                title: "Too Many Requests",
+                message: "You've made too many requests recently. Please wait a moment and try again.",
+                animation: "shake"
+            },
+            '500': {
+                title: "Internal Server Error",
+                message: "Something went wrong on our end. Our team has been notified and is working to fix it.",
+                animation: "shake"
+            },
+            '502': {
+                title: "Bad Gateway",
+                message: "The server encountered a temporary error and couldn't complete your request.",
+                animation: "bounce"
+            },
+            '503': {
+                title: "Service Unavailable",
+                message: "The service is temporarily unavailable. Please try again in a few minutes.",
+                animation: "bounce"
+            },
+            '504': {
+                title: "Gateway Timeout",
+                message: "The server took too long to respond. Please try again.",
+                animation: "shake"
+            }
+        };
+        
+        // Set dynamic content
+        const config = errorConfigs[errorStatus] || errorConfigs['500'];
+        document.getElementById('errorTitle').textContent = config.title;
+        document.getElementById('errorMessage').textContent = config.message;
+        
+        // Show error details for server errors (500+)
+        if (parseInt(errorStatus) >= 500) {
+            const errorDetails = document.getElementById('errorDetails');
+            const errorContent = document.getElementById('errorDetailsContent');
+            
+            // You can populate this with actual error details from your server
+            const details = {
+                status: errorStatus,
+                path: errorPath,
+                message: errorMessage,
+                timestamp: new Date().toISOString()
+            };
+            
+            errorContent.textContent = JSON.stringify(details, null, 2);
+            errorDetails.style.display = 'block';
+        }
+        
+        // Generate dynamic SVG based on error type
+        function generateErrorSVG(status) {
+            const svgContainer = document.getElementById('errorIllustration');
+            let svgContent = '';
+            
+            switch(status) {
+                case '404':
+                    svgContent = `
+                        <svg class="error-svg float" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Lost Student -->
+                            <circle cx="150" cy="120" r="50" fill="#4361ee" opacity="0.1"/>
+                            <circle cx="150" cy="100" r="30" fill="#FFD166"/>
+                            <ellipse cx="150" cy="115" rx="12" ry="8" fill="#333"/>
+                            <circle cx="140" cy="95" r="3" fill="#333"/>
+                            <circle cx="160" cy="95" r="3" fill="#333"/>
+                            <path d="M140 120 Q150 130 160 120" stroke="#333" stroke-width="2" fill="none"/>
+                            <rect x="135" y="130" width="30" height="60" rx="5" fill="#4361ee"/>
+                            <path d="M120 190 L180 190 L170 240 L130 240 Z" fill="#3a0ca3"/>
+                            <circle cx="120" cy="190" r="5" fill="#FF6B6B"/>
+                            <circle cx="180" cy="190" r="5" fill="#FF6B6B"/>
+                            <!-- Magnifying glass -->
+                            <circle cx="250" cy="100" r="40" fill="none" stroke="#4cc9f0" stroke-width="4" stroke-dasharray="4"/>
+                            <line x1="280" y1="130" x2="320" y2="170" stroke="#4cc9f0" stroke-width="4"/>
+                            <!-- Question marks -->
+                            <text x="250" y="170" font-family="Arial" font-size="30" fill="#f72585" text-anchor="middle">???</text>
+                            <text x="250" y="200" font-family="Arial" font-size="20" fill="#adb5bd" text-anchor="middle">Page not found</text>
+                        </svg>`;
+                    break;
+                    
+                case '500':
+                    svgContent = `
+                        <svg class="error-svg shake" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Broken server -->
+                            <rect x="100" y="80" width="200" height="140" rx="10" fill="#e9ecef"/>
+                            <rect x="120" y="100" width="160" height="100" rx="5" fill="#212529"/>
+                            <circle cx="150" cy="130" r="8" fill="#FF6B6B"/>
+                            <circle cx="180" cy="130" r="8" fill="#FFD166"/>
+                            <circle cx="210" cy="130" r="8" fill="#4cc9f0"/>
+                            <rect x="140" y="160" width="80" height="20" rx="5" fill="#6c757d"/>
+                            <!-- Wrench fixing -->
+                            <path d="M280 120 L310 90 L340 120 L310 150 Z" fill="#FFD166" transform="rotate(45 310 120)"/>
+                            <circle cx="310" cy="120" r="15" fill="#4361ee"/>
+                            <!-- Exclamation marks -->
+                            <path d="M310 180 L310 220 M310 230 L310 235" stroke="#f72585" stroke-width="8" stroke-linecap="round"/>
+                            <text x="310" y="260" font-family="Arial" font-size="16" fill="#adb5bd" text-anchor="middle">Server Error</text>
+                        </svg>`;
+                    break;
+                    
+                case '403':
+                    svgContent = `
+                        <svg class="error-svg shake" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Locked door -->
+                            <rect x="150" y="80" width="100" height="160" rx="10" fill="#6c757d"/>
+                            <rect x="160" y="90" width="80" height="140" rx="5" fill="#adb5bd"/>
+                            <circle cx="200" cy="160" r="25" fill="#FFD166"/>
+                            <rect x="195" y="120" width="10" height="40" fill="#6c757d"/>
+                            <!-- Student trying to access -->
+                            <circle cx="100" cy="120" r="25" fill="#4cc9f0"/>
+                            <ellipse cx="100" cy="140" rx="12" ry="8" fill="#333"/>
+                            <circle cx="90" cy="120" r="3" fill="#333"/>
+                            <circle cx="110" cy="120" r="3" fill="#333"/>
+                            <path d="M90 140 Q100 150 110 140" stroke="#333" stroke-width="2" fill="none"/>
+                            <rect x="85" y="150" width="30" height="60" rx="5" fill="#4361ee"/>
+                            <path d="M70 210 L130 210 L120 260 L80 260 Z" fill="#3a0ca3"/>
+                            <!-- Question mark -->
+                            <text x="100" y="110" font-family="Arial" font-size="20" fill="#f72585">?</text>
+                            <text x="200" y="260" font-family="Arial" font-size="16" fill="#adb5bd" text-anchor="middle">Access Denied</text>
+                        </svg>`;
+                    break;
+                    
+                case '401':
+                    svgContent = `
+                        <svg class="error-svg bounce" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Login screen -->
+                            <rect x="120" y="80" width="160" height="140" rx="10" fill="#e9ecef"/>
+                            <rect x="140" y="100" width="120" height="80" rx="5" fill="#212529"/>
+                            <rect x="160" y="120" width="80" height="10" rx="2" fill="#6c757d"/>
+                            <rect x="160" y="140" width="80" height="10" rx="2" fill="#6c757d"/>
+                            <rect x="180" y="160" width="40" height="8" rx="2" fill="#4361ee"/>
+                            <!-- Student with key -->
+                            <circle cx="300" cy="120" r="25" fill="#FFD166"/>
+                            <ellipse cx="300" cy="140" rx="12" ry="8" fill="#333"/>
+                            <circle cx="290" cy="120" r="3" fill="#333"/>
+                            <circle cx="310" cy="120" r="3" fill="#333"/>
+                            <path d="M290 140 Q300 150 310 140" stroke="#333" stroke-width="2" fill="none"/>
+                            <!-- Key -->
+                            <circle cx="270" cy="120" r="8" fill="#FFD166"/>
+                            <rect x="262" y="120" width="20" height="5" fill="#FFD166"/>
+                            <rect x="275" y="110" width="3" height="10" fill="#FFD166"/>
+                            <text x="200" y="260" font-family="Arial" font-size="16" fill="#adb5bd" text-anchor="middle">Login Required</text>
+                        </svg>`;
+                    break;
+                    
+                default:
+                    svgContent = `
+                        <svg class="error-svg float" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Generic confused student -->
+                            <circle cx="200" cy="120" r="50" fill="#4361ee" opacity="0.1"/>
+                            <circle cx="200" cy="100" r="30" fill="#FFD166"/>
+                            <ellipse cx="200" cy="115" rx="15" ry="10" fill="#333"/>
+                            <circle cx="190" cy="95" r="4" fill="#333"/>
+                            <circle cx="210" cy="95" r="4" fill="#333"/>
+                            <path d="M190 120 Q200 135 210 120" stroke="#333" stroke-width="2" fill="none"/>
+                            <rect x="185" y="130" width="30" height="60" rx="5" fill="#4361ee"/>
+                            <path d="M170 190 L230 190 L220 240 L180 240 Z" fill="#3a0ca3"/>
+                            <!-- Question marks -->
+                            <text x="200" y="180" font-family="Arial" font-size="40" fill="#f72585" text-anchor="middle">?</text>
+                            <text x="200" y="280" font-family="Arial" font-size="16" fill="#adb5bd" text-anchor="middle">Something went wrong</text>
+                        </svg>`;
+            }
+            
+            svgContainer.innerHTML = svgContent;
+            
+            // Add animation class
+            const svg = svgContainer.querySelector('.error-svg');
+            svg.classList.add(config.animation);
+        }
+        
+        // Generate the SVG
+        generateErrorSVG(errorStatus);
+        
+        // Mobile menu functionality (from dashboard)
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Auto-hide error details after 10 seconds for non-admin users
+        setTimeout(() => {
+            const errorDetails = document.getElementById('errorDetails');
+            if (errorDetails && errorDetails.style.display !== 'none') {
+                errorDetails.style.opacity = '0.7';
+            }
+        }, 10000);
+        
+        // Add interactive elements
+        document.querySelectorAll('.btn-error').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Easter egg: Click on error illustration
+        document.getElementById('errorIllustration').addEventListener('click', function() {
+            this.classList.add('shake');
+            setTimeout(() => {
+                this.classList.remove('shake');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

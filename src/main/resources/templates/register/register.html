@@ -1,0 +1,367 @@
+<!-- src/main/resources/templates/user/user-form.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .user-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0d6efd;
+        }
+        .form-section h5 {
+            color: #0d6efd;
+            margin-bottom: 15px;
+        }
+        .password-strength {
+            height: 5px;
+            margin-top: 5px;
+            border-radius: 2px;
+        }
+        .field-hint {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-form-container">
+            <!-- Header -->
+            <div class="form-header">
+                <h2><i class="fas fa-user-plus me-2"></i>Create New User</h2>
+                <p class="text-muted">Register a new student or administrator for GradeGoal</p>
+            </div>
+            
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <!-- User Form -->
+
+            <form th:action="@{/save}" th:object="${user}" method="post" id="userForm">
+                
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <h5><i class="fas fa-id-card me-2"></i>Personal Information</h5>
+                    
+                    <!-- Student Number -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="studentNo" class="form-label required-field">
+                                <i class="fas fa-id-badge me-1"></i>Student Number
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="studentNo" 
+                                   th:field="*{studentNo}"
+                                   placeholder="e.g., 20230001"
+                                   required
+                                   maxlength="20">
+                            <div class="field-hint">
+                                Must be unique. This will be used for login.
+                            </div>
+                            <div th:if="${#fields.hasErrors('studentNo')}" class="invalid-feedback d-block">
+                                <span th:errors="*{studentNo}"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Role Selection -->
+                        <div class="col-md-6">
+                            <label for="role" class="form-label required-field">
+                                <i class="fas fa-user-tag me-1"></i>Role
+                            </label>
+
+                            <input type="hidden" th:field="*{role}" th:value="'STUDENT'">
+
+                            <div class="form-control" style="background-color: #e9ecef;">
+                                Student
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Name -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="name" class="form-label required-field">
+                                <i class="fas fa-user me-1"></i>Full Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   th:field="*{name}"
+                                   placeholder="Enter full name"
+                                   required
+                                   maxlength="100">
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="row mb-3">
+                        <div class="col-md-12" th:contenteditable="${editable}">
+                            <label for="email" class="form-label required-field">
+                                <i class="fas fa-envelope me-1"></i>Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   th:field="*{email}"
+                                   placeholder="student@example.com"
+                                   required
+                                   th:contenteditable="${editable}"
+                                   maxlength="100">
+                            <div class="field-hint">
+                                Must be unique. Used for notifications and password recovery.
+                            </div>
+                            <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback d-block">
+                                <span th:errors="*{email}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Security Section -->
+                <div class="form-section">
+                    <h5><i class="fas fa-lock me-2"></i>Account Security</h5>
+                    
+                    <!-- Password -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label required-field">
+                                <i class="fas fa-key me-1"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       th:field="*{password}"
+                                       placeholder="Enter password"
+                                       required
+                                       minlength="8"
+                                       oninput="checkPasswordStrength()">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="field-hint">
+                                Minimum 8 characters with letters and numbers
+                            </div>
+                            <div id="passwordStrength" class="password-strength mt-2"></div>
+                            <small id="passwordStrengthText" class="text-muted"></small>
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <label for="confirmPassword" class="form-label required-field">
+                                <i class="fas fa-key me-1"></i>Confirm Password
+                            </label>
+                            <div class="input-group">
+
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="confirmPassword"
+                                       name="confirmPassword"
+                                       placeholder="Re-enter password"
+                                       required
+                                       oninput="checkPasswordMatch()">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="passwordMatch" class="field-hint"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Information Section -->
+                <div class="form-section">
+                    <h5><i class="fas fa-graduation-cap me-2"></i>Academic Information</h5>
+
+                    <!-- Degree Selection -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="degree" class="form-label">
+                                <i class="fas fa-university me-1"></i>Degree Program
+                            </label>
+                            <select class="form-select"
+                                    id="degree"
+                                    th:field="*{degree.name}"
+                                    th:errorclass="is-invalid">
+                                <option value="">Select Degree Program (Optional)</option>
+                                <option th:each="deg : ${degrees}"
+                                        th:value="${deg.name}"
+                                        th:text="${deg.name + ' (' + deg.code + ')'}">
+                                </option>
+                            </select>
+                            <div class="field-hint">
+                                Associate this user with a degree program
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <a th:href="@{/login}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Login
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                            <i class="fas fa-save me-2"></i>Create User
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Form Validation Script -->
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Check password strength
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            let color = '#dc3545'; // Red
+            let text = 'Weak';
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            if (strength >= 4) {
+                color = '#198754'; // Green
+                text = 'Strong';
+            } else if (strength >= 2) {
+                color = '#ffc107'; // Yellow
+                text = 'Moderate';
+            }
+            
+            strengthBar.style.width = (strength * 20) + '%';
+            strengthBar.style.backgroundColor = color;
+            strengthText.textContent = 'Password strength: ' + text;
+            strengthText.style.color = color;
+        }
+        
+        // Check password match
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchDiv = document.getElementById('passwordMatch');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (confirmPassword === '') {
+                matchDiv.textContent = '';
+                matchDiv.style.color = '';
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            if (password === confirmPassword) {
+                matchDiv.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>Passwords match';
+                matchDiv.style.color = '#198754';
+                submitBtn.disabled = false;
+            } else {
+                matchDiv.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i>Passwords do not match';
+                matchDiv.style.color = '#dc3545';
+                submitBtn.disabled = true;
+            }
+        }
+        
+        // Form validation on submit
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Password must be at least 8 characters long!');
+                return false;
+            }
+            
+            // If validation passes, let the form submit normally
+            return true;
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkPasswordStrength();
+            checkPasswordMatch();
+        });
+    </script>
+</body>
+</html>
