@@ -35,8 +35,8 @@ public class CourseController {
         model.addAttribute("map",courseService.examMark(loggedinuser));
         model.addAttribute("courses",courseService.getCourses(loggedinuser));
         model.addAttribute("completedCourses",courseService.completed(loggedinuser));
-        model.addAttribute("averageGrade",Math.round(userService.AverageGrade(loggedinuser)));
-        model.addAttribute("targetAchievement",Math.round(courseService.targetArchieved(loggedinuser)));
+        model.addAttribute("averageGrade",userService.AverageGrade(loggedinuser));
+        model.addAttribute("targetAchievement",courseService.targetArchieved(loggedinuser));
         return "course/courses";
     }
 

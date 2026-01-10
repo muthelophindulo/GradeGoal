@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/grades")
@@ -28,44 +31,95 @@ public class GradesController {
     private CourseService courseService;
 
     @GetMapping
-    public String grades(Model model, Principal principal){
+    public String grades(Model model, Principal principal) {
         String loggedinuser = principal.getName();
-        model.addAttribute("user",userService.getUser(loggedinuser));
-        model.addAttribute("totalCourses",courseService.getCourses(loggedinuser).size());
-        model.addAttribute("averageGrade",userService.AverageGrade(loggedinuser));
-        model.addAttribute("completedAssessments",assessmentService.completed(loggedinuser));
-        model.addAttribute("targetAchievement",courseService.targetArchieved(loggedinuser));
-
-        List<Course> semester1courses = courseService.getCourses(loggedinuser)
-                .stream()
+        
+        // User info
+        model.addAttribute("user", userService.getUser(loggedinuser));
+        
+        // Get count of all courses for the user
+        List<Course> allCourses = courseService.getCourses(loggedinuser);
+        model.addAttribute("totalCourses", allCourses.size());
+        
+        // Calculate average grade
+        double avgGrade = userService.AverageGrade(loggedinuser);
+        model.addAttribute("averageGrade", String.format("%.1f", avgGrade));
+        
+        // Completed assessments count
+        int completedAssessments = assessmentService.completed(loggedinuser);
+        model.addAttribute("completedAssessments", completedAssessments);
+        
+        // Target achievement percentage
+        double targetAchievement = courseService.targetArchieved(loggedinuser);
+        model.addAttribute("targetAchievement", String.format("%.1f", targetAchievement));
+        
+        // Semester 1 courses
+        List<Course> semester1courses = allCourses.stream()
                 .filter(course -> course.getSemester() == 1)
-                .toList();
-        model.addAttribute("semester1Courses",semester1courses);
-        model.addAttribute("sem1Completed",4);
-
-        List<Course> semester2courses = courseService.getCourses(loggedinuser)
-                .stream()
+                .collect(Collectors.toList());
+        model.addAttribute("semester1Courses", semester1courses);
+        
+        // Semester 1 completed count
+        long sem1Completed = semester1courses.stream()
+                .filter(course -> course.getActualMark() >= course.getPassMark())
+                .count();
+        model.addAttribute("sem1Completed", sem1Completed);
+        
+        // Semester 2 courses
+        List<Course> semester2courses = allCourses.stream()
                 .filter(course -> course.getSemester() == 2)
-                .toList();
-        model.addAttribute("semester2Courses",semester2courses);
-        model.addAttribute("sem2Completed",4);
+                .collect(Collectors.toList());
+        model.addAttribute("semester2Courses", semester2courses);
+        
+        // Semester 2 completed count
+        long sem2Completed = semester2courses.stream()
+                .filter(course -> course.getActualMark() >= course.getPassMark())
+                .count();
+        model.addAttribute("sem2Completed", sem2Completed);
+        
 
-        HashMap<Long, List<Assessment>> courseAssessment = new HashMap<>();
-        List<Course> courses = courseService.getCourses(loggedinuser);
-        for(Course x : courses){
-            courseAssessment.put(x.getId(),x.getAssessments());
+        Map<String, Object> allChartData = new HashMap<>();
+        
+        for (Course course : allCourses) {
+            if (course.getAssessments() != null && !course.getAssessments().isEmpty()) {
+                Map<String, Object> courseData = new HashMap<>();
+                
+                // Get assessment data
+                List<String> names = new ArrayList<>();
+                List<Double> marks = new ArrayList<>();
+                List<Double> weights = new ArrayList<>();
+                
+                for (Assessment assessment : course.getAssessments()) {
+                    names.add(assessment.getName());
+                    marks.add(assessment.getActualMark());
+                    weights.add(assessment.getWeigh());
+                }
+                
+                courseData.put("names", names);
+                courseData.put("marks", marks);
+                courseData.put("weights", weights);
+                courseData.put("target", course.getTargetMark());
+                courseData.put("actual", course.getActualMark());
+                courseData.put("pass", course.getPassMark());
+                
+                allChartData.put(course.getId().toString(), courseData);
+            }
         }
+        
 
-        model.addAttribute("assessmentsByCourseId", courseAssessment);
-
-        model.addAttribute("overallAverage",50);
-        model.addAttribute("completedPercentage",90);
-        model.addAttribute("targetsMet",70);
-        model.addAttribute("currentGPA",userService.GPA(loggedinuser));
-
-
-
-
+        model.addAttribute("allChartData", allChartData);
+        
+        // Calculate overall
+        double overallAverage = allCourses.stream()
+                .filter(c -> c.getActualMark() > 0)
+                .mapToDouble(Course::getActualMark)
+                .average()
+                .orElse(0.0);
+        model.addAttribute("overallAverage", String.format("%.0f",overallAverage));
+        model.addAttribute("completedPercentage",courseService.completed(loggedinuser));
+        model.addAttribute("targetsMet",courseService.targetArchieved(loggedinuser));
+        model.addAttribute("currentGPA", String.format("%.2f", userService.GPA(loggedinuser)));
+        
         return "grades/dataAnalysis";
     }
 }

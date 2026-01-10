@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -43,7 +44,7 @@ public class UserService {
             average += x.getActualMark();
         }
 
-        return average / courses.size();
+        return Math.round(average / courses.size());
 
     }
 
@@ -64,6 +65,23 @@ public class UserService {
             }
         }
 
-        return gpa / courses.size();
+        return Math.round(gpa / courses.size());
+    }
+
+    /* get current year of study */
+    public int yearOfStudy(String studNo){
+        int currentYear = LocalDate.now().getYear();
+        //225004680
+        int regYear = Integer.parseInt("20"+studNo.substring(1,3));
+
+        return currentYear - regYear + 1;
+    }
+
+    /* get year of graduation*/
+    public int gradYear(String studNo){
+        int duration = userRepository.findByStudentNo(studNo).getDegree().getDuration();
+        int regYear = Integer.parseInt("20"+studNo.substring(1,3));
+
+        return regYear + duration;
     }
 }

@@ -33,7 +33,7 @@ public class AssessmentController {
 
         model.addAttribute("pendingCount",assessmentService.pending(principal.getName()));
 
-        model.addAttribute("averageAchievement",Math.round(assessmentService.AverageGrade(principal.getName())));
+        model.addAttribute("averageAchievement",assessmentService.AverageGrade(principal.getName()));
 
         model.addAttribute("assessments",assessmentService.getAssessments(principal.getName()));
 
@@ -94,7 +94,11 @@ public class AssessmentController {
 
     @GetMapping("delete/{id}")
     public String deleteAssessment(@PathVariable Long id){
-        assessmentService.deleteAssessment(assessmentService.getAssessment(id));
+        try{
+            assessmentService.deleteAssessment(assessmentService.getAssessment(id));
+        }catch (Exception e){
+            System.out.println("could not delete Assessment " +e.getMessage());
+        }
 
         return "redirect:/assessment/list";
     }

@@ -3,6 +3,8 @@ package com.GradeGoal.controller;
 import com.GradeGoal.service.AssessmentService;
 import com.GradeGoal.service.CourseService;
 import com.GradeGoal.service.UserService;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,9 @@ public class UserController {
         model.addAttribute("completedCourses",courseService.completed(loggedinuser));
         model.addAttribute("averageGrade",userService.AverageGrade(loggedinuser));
         model.addAttribute("totalAssessments",userService.getUser(loggedinuser).getAssessments().size());
-        model.addAttribute("yearOfStudy",1); //TODO calculate the year of study
+        model.addAttribute("yearOfStudy",userService.yearOfStudy(loggedinuser));
         model.addAttribute("gpa",userService.GPA(loggedinuser));
-        model.addAttribute("graduationYear","may 2028"); //TODO calculation of graduation year
+        model.addAttribute("graduationYear","may " + userService.gradYear(loggedinuser));
 
         model.addAttribute("courseCompletionRate",courseService.completed(loggedinuser));
         model.addAttribute("assessmentCompletionRate",assessmentService.completed(loggedinuser));
@@ -49,138 +51,94 @@ public class UserController {
 
     @PostMapping("/verify-password")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> verifyPassword(
+    public String verifyPassword(
             @RequestParam String currentPassword,
-            Principal principal) {
+            Principal principal,
+            HttpServletRequest request) {
 
-        Map<String, Object> response = new HashMap<>();
         String username = principal.getName();
-
-        // Call service to verify password
-        boolean isValid = passwordEncoder.matches(currentPassword,userService.getUser(username).getPassword());
-
-        if (isValid) {
-            response.put("success", true);
-            response.put("message", "Password verified successfully");
-        } else {
-            response.put("success", false);
-            response.put("message", "Incorrect password");
+        if(passwordEncoder.matches(currentPassword,userService.getUser(username).getPassword())){
+            if(request.getHeader("Referer").contains("change")){
+                return "redirect:/user/update-password";
+            } else if (request.getHeader("Referer").contains("delete")) {
+                return "redirect:/user/delete-account";
+            }
+        }else{
+            return "redirect:/user/verify-password";
         }
-
-        return ResponseEntity.ok(response);
+        return request.getHeader("Referer");
     }
 
     // Update password
-    @PostMapping("/update-password")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> updatePassword(
-            @RequestParam String currentPassword,
-            @RequestParam String newPassword,
-            @RequestParam String confirmPassword,
-            Principal principal) {
+    @GetMapping("/change")
+    public String showUpdate(Model model,Principal principal){
+        String username = principal.getName();
+        model.addAttribute("user",userService.getUser(username));
 
-        Map<String, Object> response = new HashMap<>();
+        return "user/changePass";
+    }
+    @PostMapping("/update-password")
+    public String updatePassword(
+            @RequestParam String newPassword,
+            @RequestParam String currentPassword,
+            @RequestParam String confirmPassword,
+            Principal principal,
+            Model model) {
         String username = principal.getName();
 
-        // Validate new passwords match
-        if (!newPassword.equals(confirmPassword)) {
-            response.put("success", false);
-            response.put("message", "Passwords do not match");
-            return ResponseEntity.ok(response);
+        if(!newPassword.equals(confirmPassword)){
+            model.addAttribute("error","new password does not equal confirm password");
+            model.addAttribute("user",userService.getUser(username));
+            return "user/changePass";
+        }
+        //check if the current password is the same
+        if(!passwordEncoder.matches(currentPassword,userService.getUser(username).getPassword())){
+            model.addAttribute("error","entered password do not match current password");
+            model.addAttribute("user",userService.getUser(username));
+            return "user/changePass";
         }
 
-        // Validate password strength
-        if (newPassword.length() < 8) {
-            response.put("success", false);
-            response.put("message", "Password must be at least 8 characters long");
-            return ResponseEntity.ok(response);
+        try {
+            userService.getUser(username).setPassword(passwordEncoder.encode(newPassword));
+            System.out.println("pass changed");
+            model.addAttribute("success","password changed");
+            return "redirect:/user/profile";
+        } catch (Exception e) {
+            model.addAttribute("error","something went wrong" + e.getMessage());
+            model.addAttribute("user",userService.getUser(username));
+            return "user/changePass";
         }
 
-        // Update password
-        userService.getUser(username).setPassword(passwordEncoder.encode(newPassword));
-
-        boolean updated = passwordEncoder.matches(newPassword, userService.getUser(username).getPassword());
-
-        if (updated) {
-            response.put("success", true);
-            response.put("message", "Password updated successfully");
-        } else {
-            response.put("success", false);
-            response.put("message", "Failed to update password. Current password may be incorrect.");
-        }
-
-        return ResponseEntity.ok(response);
     }
 
     // Delete account
-    @PostMapping("/delete-account")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> deleteAccount(
+    //show delete page
+    @GetMapping("/delete-account")
+    public String showdelete(Model model,Principal principal){
+        String username = principal.getName();
+        model.addAttribute("user",userService.getUser(username));
+        model.addAttribute("courseCount",courseService.getCourses(username).size());
+        model.addAttribute("assessmentCount",assessmentService.getAssessments(username).size());
+
+        return "user/deleteAcct";
+    }
+    @PostMapping("/delete")
+    public String deleteAccount(
             @RequestParam String password,
             Principal principal,
             HttpSession session) {
 
-        Map<String, Object> response = new HashMap<>();
         String username = principal.getName();
 
         // Verify password first
         boolean isValid = passwordEncoder.matches(password,userService.getUser(username).getPassword());
 
-        if (!isValid) {
-            response.put("success", false);
-            response.put("message", "Incorrect password");
-            return ResponseEntity.ok(response);
+        if(isValid){
+            userService.deleteUser(userService.getUser(username));
+            return "redirect:/logout";
+        }else{
+            return "redirect:/user/profile";
         }
-
-        if (isValid) {
-            response.put("success", true);
-            response.put("message", "Account deleted successfully");
-            // Invalidate session
-            session.invalidate();
-        } else {
-            response.put("success", false);
-            response.put("message", "Failed to delete account");
-        }
-
-        return ResponseEntity.ok(response);
     }
-
-    /*
-    @GetMapping("change-password")
-    public String changePass(
-            @RequestParam String currentPassword,
-            @RequestParam String newPassword,
-            @RequestParam String confirmPassword,
-            Principal principal,
-            RedirectAttributes redirectAttributes
-    ){
-
-        if(passwordEncoder.matches(currentPassword,userService.getUser(principal.getName()).getPassword())){
-            if(newPassword.equals(confirmPassword)){
-                userService.getUser(principal.getName()).setPassword(passwordEncoder.encode(newPassword));
-            }
-        }
-
-        redirectAttributes.addAttribute("message","password changed successfully");
-        return "redirect/user/profile";
-    }
-
-    @GetMapping("settings")
-    public String settings(Model model,Principal principal){
-        return "user/settings";
-    }
-
-    @GetMapping("delete-account")
-    public String delete(@RequestParam String password,
-                         Principal principal,
-                         HttpSession session){
-        String loogedinuser = principal.getName();
-
-        if(passwordEncoder.matches(password,userService.getUser(loogedinuser).getPassword())){
-            userService.deleteUser(userService.getUser(loogedinuser));
-            session.invalidate();
-        }
-        return "redirect:/login";
-    }*/
 
 }

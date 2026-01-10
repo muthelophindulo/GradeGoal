@@ -37,6 +37,7 @@ public class AssessmentService {
         return assessmentRepository.save(assessment);
     }
 
+    /* count pending assessments */
     public int pending(String studNo){
         List<Assessment> assessments = assessmentRepository.findAll();
         List<Assessment> userAssessments = new ArrayList<>();
@@ -57,6 +58,7 @@ public class AssessmentService {
         return pending;
     }
 
+    /* count completed assessments */
     public int completed(String studNo){
         List<Assessment> assessments = assessmentRepository.findAll();
         List<Assessment> userAssessments = new ArrayList<>();
@@ -81,15 +83,16 @@ public class AssessmentService {
         List<Assessment> assessments = userService.getUser(studNo).getAssessments();
         double average = 0;
 
-        if(assessments.isEmpty()){
-            return average;
-        }
+        if(assessments.isEmpty())
+            return Math.round(average);
 
-        for(Assessment x : assessments){
+        double total = assessments.stream().mapToDouble(Assessment::getActualMark).sum();
+
+        /*for(Assessment x : assessments){
             average += x.getActualMark();
-        }
+        }*/
 
-        return average / assessments.size();
+        return Math.round(total / assessments.size());
 
     }
 

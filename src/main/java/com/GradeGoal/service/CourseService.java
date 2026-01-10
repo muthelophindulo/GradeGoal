@@ -22,16 +22,10 @@ public class CourseService {
     }
 
     public List<Course> getCourses(String studentNo){
-        List<Course> courses = courseRepository.findAll();
-        List<Course> userCourses = new ArrayList<>();
-
-        for(Course x : courses){
-            if(x.getUser().getStudentNo().equals(studentNo)){
-                userCourses.add(x);
-            }
-        }
-
-        return userCourses;
+        return courseRepository.findAll()
+                .stream()
+                .filter(course -> course.getUser().getStudentNo().equals(studentNo))
+                .toList();
     }
 
     public Course saveCourse(Course course){
@@ -56,11 +50,7 @@ public class CourseService {
             return completed;
         }
 
-        for(Course x : courses){
-            if(x.getActualMark() != 0){
-                completed++;
-            }
-        }
+        completed = courses.stream().filter(course -> course.getActualMark()!=0).toList().size();
         return completed;
     }
 
@@ -69,18 +59,21 @@ public class CourseService {
                 .stream()
                 .filter(course -> course.getUser().getStudentNo().equals(studNo))
                 .toList();
-        double target = 0;
+        int target = 0;
 
         if (courses.isEmpty())
             return 0;
 
-        for(Course x : courses){
+        /*for(Course x : courses){
             if(x.getActualMark() >= x.getTargetMark()){
                 target++;
             }
-        }
+        }*/
 
-        return target / courses.size() * 100;
+        target = courses.stream().filter(course -> course.getActualMark() >= course.getTargetMark()).toList().size();
+
+
+        return Math.round(target / courses.size() * 100);
     }
 
     public List<Course> topCourses(String studNo){
@@ -91,7 +84,7 @@ public class CourseService {
                 .stream()
                 .sorted(Comparator.comparing(Course::getActualMark).reversed())
                 .collect(Collectors.toList());
-        double largest = courses.getFirst().getActualMark();
+
         int count =0;
         for(Course x : courses){
             top3.add(x);
@@ -103,7 +96,7 @@ public class CourseService {
         return top3;
     }
 
-    //used to calculate exam mark based from course mark and the wighs of assessments
+    //used to calculate exam mark based from course mark and the weigh of assessments
     public Map<String, Double> examMark(String studNo){
         Map<String, Double> weigh = new HashMap<>();
 
@@ -124,11 +117,13 @@ public class CourseService {
             double s = (v / 100.0) * d;
             double f = 1 - (v / 100.0);
             double EM = Math.round((x.getActualMark() - s )/f );
-            weigh.put(x.getCode(),EM);
-        }
 
-        System.out.println(weigh.values());
-        System.out.println(weigh.keySet());
+            if(x.getActualMark() == 0 || x.getAssessments().isEmpty()){
+                weigh.put(x.getCode(),0.0);
+            }else{
+                weigh.put(x.getCode(),EM);
+            }
+        }
 
         return weigh;
     }

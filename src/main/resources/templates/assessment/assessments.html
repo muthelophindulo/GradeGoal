@@ -784,7 +784,7 @@
                             <div>
                                 <small>Actual</small>
                                 <div class="fw-bold" 
-                                     th:if="${assessment.actualMark != null}" 
+                                     th:if="${assessment.actualMark != 0.0}"
                                      th:text="${assessment.actualMark} + '%'"
                                      th:classappend="${assessment.actualMark >= assessment.targetMark} ? 'text-success' : 'text-warning'">
                                 </div>
@@ -793,7 +793,7 @@
                             <div>
                                 <small>Difference</small>
                                 <div class="fw-bold"
-                                     th:if="${assessment.actualMark != null}"
+                                     th:if="${assessment.actualMark != 0.0}"
                                      th:text="${#numbers.formatDecimal(assessment.actualMark - assessment.targetMark, 1, 1)} + '%'"
                                      th:classappend="${(assessment.actualMark - assessment.targetMark) >= 0} ? 'text-success' : 'text-danger'">
                                 </div>
