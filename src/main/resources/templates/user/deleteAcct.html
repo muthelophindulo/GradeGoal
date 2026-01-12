@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #ffd166;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            min-height: 100vh;
+            padding-top: 0;
+        }
+        
+        .deletion-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 20px;
+        }
+        
+        .deletion-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+        
+        .deletion-header {
+            background: linear-gradient(135deg, var(--danger-color), #ff6b6b);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .deletion-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+        
+        .deletion-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .deletion-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .deletion-body {
+            padding: 2.5rem;
+        }
+        
+        .warning-section {
+            background-color: rgba(247, 37, 133, 0.05);
+            border-left: 5px solid var(--danger-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .warning-section i {
+            color: var(--danger-color);
+            font-size: 1.5rem;
+            margin-top: 0.2rem;
+        }
+        
+        .warning-section h5 {
+            color: var(--danger-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .data-summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .data-summary h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .data-value {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        .password-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #dee2e6;
+        }
+        
+        .password-section h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .form-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .confirmation-section {
+            background-color: rgba(255, 209, 102, 0.1);
+            border: 2px dashed var(--warning-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .confirmation-section h4 {
+            color: #e76f51;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .form-check {
+            margin-bottom: 1rem;
+            padding-left: 2.5rem;
+        }
+        
+        .form-check-input {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-left: -2.5rem;
+            margin-top: 0.2rem;
+            border: 2px solid #adb5bd;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(247, 37, 133, 0.25);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: #495057;
+            cursor: pointer;
+        }
+        
+        .final-warning {
+            background-color: rgba(247, 37, 133, 0.1);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .final-warning i {
+            color: var(--danger-color);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .final-warning p {
+            margin-bottom: 0;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, var(--danger-color), #ff6b6b);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            border: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-delete:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        .btn-delete:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .processing {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+        
+        .footer-note {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .deletion-container {
+                margin: 1.5rem auto;
+                padding: 0 15px;
+            }
+            
+            .deletion-header {
+                padding: 1.5rem;
+            }
+            
+            .deletion-header h1 {
+                font-size: 2rem;
+            }
+            
+            .deletion-body {
+                padding: 1.5rem;
+            }
+            
+            .warning-icon {
+                font-size: 3rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-cancel, .btn-delete {
+                width: 100%;
+            }
+            
+            .data-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .data-value {
+                align-self: flex-end;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .deletion-header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .deletion-header p {
+                font-size: 1rem;
+            }
+            
+            .warning-section, .password-section, .confirmation-section {
+                padding: 1.25rem;
+            }
+        }
+        
+        /* Animation for confirmation checkboxes */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .form-check-input:checked {
+            animation: pulse 0.3s ease;
+        }
+        
+        /* Progress indicator for deletion process */
+        .progress-indicator {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .progress-indicator.show {
+            display: block;
+        }
+        
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="deletion-container">
+        <div class="deletion-card">
+            <!-- Header Section -->
+            <div class="deletion-header">
+                <div class="warning-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <h1>Delete Your Account</h1>
+                <p>This action is permanent and cannot be undone</p>
+            </div>
+            
+            <!-- Body Section -->
+            <div class="deletion-body">
+                <!-- User Info -->
+                <div class="user-info">
+                    <p>You are logged in as: <strong th:text="${user.name}">John Doe</strong> (<span th:text="${user.email}">john.doe@example.com</span>)</p>
+                </div>
+                
+                <!-- Warning Section -->
+                <div class="warning-section">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <div>
+                        <h5>Important Warning</h5>
+                        <p class="mb-0">
+                            Once you delete your account, all your data will be permanently erased from GradeGoal. 
+                            This includes all courses, assessments, grades, and any other associated data. 
+                            You will not be able to recover any information after deletion.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- User Data Summary -->
+                <div class="data-summary">
+                    <h4><i class="bi bi-pie-chart-fill"></i> Your Account Summary</h4>
+
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="bi bi-journal-bookmark"></i>
+                            <span>Courses Created:</span>
+                        </div>
+                        <div class="data-value" th:text="${courseCount}">
+                            12
+                        </div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="bi bi-clipboard-data"></i>
+                            <span>Assessments Created:</span>
+                        </div>
+                        <div class="data-value" th:text="${assessmentCount}">
+                            45
+                        </div>
+                    </div>
+
+                </div>
+                
+                <!-- Password Confirmation Form -->
+                <form th:action="@{/user/delete}" method="post" id="deleteAccountForm">
+                    <div class="password-section">
+                        <h4><i class="bi bi-key-fill"></i> Confirm Your Password</h4>
+                        <p class="text-muted mb-3">
+                            To authorize this action, please enter your current password.
+                        </p>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Current Password</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   required
+                                   placeholder="Enter your current password"
+                                   autocomplete="current-password">
+                            <div class="form-text">
+                                Your password is required for security verification.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Final Confirmation -->
+                    <div class="confirmation-section">
+                        <h4><i class="bi bi-check-circle-fill"></i> Final Confirmation</h4>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input confirm-checkbox" 
+                                   type="checkbox" 
+                                   id="confirmDataLoss" 
+                                   required>
+                            <label class="form-check-label" for="confirmDataLoss">
+                                I understand that all my data will be permanently deleted and cannot be recovered.
+                            </label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input confirm-checkbox" 
+                                   type="checkbox" 
+                                   id="confirmBackup" 
+                                   required>
+                            <label class="form-check-label" for="confirmBackup">
+                                I have backed up any data I wish to keep before proceeding.
+                            </label>
+                        </div>
+                        
+                        <div class="final-warning">
+                            <i class="bi bi-exclamation-diamond-fill"></i>
+                            <p>
+                                By checking the boxes above and clicking "Delete My Account", you acknowledge that this action is irreversible.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator" id="progressIndicator">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="text-danger">Processing account deletion...</span>
+                    </div>
+                    
+                    <!-- CSRF Token (if using Spring Security) -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons mt-4">
+                        <button type="button" class="btn-cancel" id="cancelButton">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </button>
+                        <input type="submit" class="btn-delete" id="deleteButton" disabled placeholder="Delete my Account">
+                    </div>
+                </form>
+                
+                <!-- Footer Note -->
+                <div class="footer-note">
+                    <p>If you're having issues with your account, consider <a th:href="@{/support}">contacting support</a> before deletion.</p>
+                    <p class="mb-0">© 2025 GradeGoal Academic Tracker</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForm = document.getElementById('deleteAccountForm');
+            const deleteButton = document.getElementById('deleteButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const confirmDataLoss = document.getElementById('confirmDataLoss');
+            const confirmBackup = document.getElementById('confirmBackup');
+            const passwordField = document.getElementById('password');
+            const progressIndicator = document.getElementById('progressIndicator');
+            
+            // Enable/disable delete button based on checkboxes and password
+            function updateDeleteButtonState() {
+                const isPasswordEntered = passwordField.value.trim().length > 0;
+                const allChecked = confirmDataLoss.checked && confirmBackup.checked;
+                
+                deleteButton.disabled = !(isPasswordEntered && allChecked);
+                
+                if (deleteButton.disabled) {
+                    deleteButton.title = "Please fill in all required fields and confirmations";
+                } else {
+                    deleteButton.title = "";
+                }
+            }
+            
+            // Add event listeners to checkboxes and password field
+            confirmDataLoss.addEventListener('change', updateDeleteButtonState);
+            confirmBackup.addEventListener('change', updateDeleteButtonState);
+            passwordField.addEventListener('input', updateDeleteButtonState);
+            
+            // Form submission handler
+            deleteForm.addEventListener('submit', function(event) {
+                // Double-check confirmations
+                if (!confirmDataLoss.checked || !confirmBackup.checked) {
+                    event.preventDefault();
+                    showAlert('Please confirm both statements before deleting your account.', 'warning');
+                    return;
+                }
+                
+                // Final warning with detailed information
+                const userConfirmed = confirm(
+                    "🚨 FINAL WARNING: ACCOUNT DELETION CONFIRMATION\n\n" +
+                    "You are about to PERMANENTLY delete your GradeGoal account.\n\n" +
+                    "This will delete:\n" +
+                    "• " + document.querySelector('[th\\:text="${courseCount}"]').textContent + " courses you created\n" +
+                    "• " + document.querySelector('[th\\:text="${assessmentCount}"]').textContent + " assessments\n" +
+                    "• " + document.querySelector('[th\\:text="${gradeCount}"]').textContent + " grade entries\n" +
+                    "• All your academic progress data\n\n" +
+                    "This action CANNOT be undone.\n\n" +
+                    "Are you absolutely sure you want to proceed?"
+                );
+                
+                if (!userConfirmed) {
+                    event.preventDefault();
+                } else {
+                    // Show processing state
+                    deleteButton.innerHTML = '<i class="bi bi-trash3"></i> Deleting Account...';
+                    deleteButton.classList.add('processing');
+                    deleteButton.disabled = true;
+                    cancelButton.disabled = true;
+                    progressIndicator.classList.add('show');
+                    
+                    // Disable all form inputs
+                    document.querySelectorAll('input, button').forEach(el => {
+                        if (el !== deleteButton && el !== cancelButton) {
+                            el.disabled = true;
+                        }
+                    });
+                }
+            });
+            
+            // Cancel button handler
+            cancelButton.addEventListener('click', function() {
+                if (confirm("Are you sure you want to cancel? Your account will not be deleted.")) {
+                    window.location.href = '/dashboard'; // Redirect to dashboard
+                }
+            });
+            
+            // Show alert function
+            function showAlert(message, type) {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.custom-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                // Create alert element
+                const alertEl = document.createElement('div');
+                alertEl.className = `custom-alert alert alert-${type === 'warning' ? 'warning' : 'danger'} alert-dismissible fade show`;
+                alertEl.style.position = 'fixed';
+                alertEl.style.top = '20px';
+                alertEl.style.right = '20px';
+                alertEl.style.zIndex = '9999';
+                alertEl.style.maxWidth = '400px';
+                alertEl.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                alertEl.innerHTML = `
+                    <strong>${type === 'warning' ? 'Warning' : 'Error'}:</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(alertEl);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertEl.parentNode) {
+                        alertEl.classList.remove('show');
+                        setTimeout(() => alertEl.remove(), 150);
+                    }
+                }, 5000);
+            }
+            
+            // Add some visual feedback when checking confirmations
+            document.querySelectorAll('.confirm-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        this.parentElement.style.backgroundColor = 'rgba(247, 37, 133, 0.05)';
+                        this.parentElement.style.padding = '1rem';
+                        this.parentElement.style.borderRadius = '10px';
+                        this.parentElement.style.transition = 'all 0.3s ease';
+                    } else {
+                        this.parentElement.style.backgroundColor = '';
+                        this.parentElement.style.padding = '';
+                    }
+                });
+            });
+            
+            // Initialize button state
+            updateDeleteButtonState();
+            
+            // Add visual feedback for password field
+            passwordField.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            
+            passwordField.addEventListener('blur', function() {
+                this.parentElement.style.transform = '';
+            });
+            
+            // Prevent accidental navigation
+            window.addEventListener('beforeunload', function(e) {
+                if (passwordField.value.trim().length > 0 || 
+                    confirmDataLoss.checked || 
+                    confirmBackup.checked) {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                    return e.returnValue;
+                }
+            });
+            
+            // Handle Escape key to cancel
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (confirmDataLoss.checked || confirmBackup.checked || passwordField.value.trim().length > 0) {
+                        if (confirm("You have unsaved changes. Cancel account deletion?")) {
+                            window.location.href = '/dashboard';
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

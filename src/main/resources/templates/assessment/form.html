@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${assessment?.id} ? 'Edit Assessment' : 'Add Assessment'">Add Assessment - GradeGoal</title>
+    
+    <!-- CSS links same as dashboard -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px; /* Space for fixed header */
+        }
+        
+        /* Fixed Header - ALWAYS STICKY */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Form Specific Styles */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .form-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .mark-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+                position: fixed;
+                top: 0;
+                z-index: 999;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-profile .user-details {
+                display: none;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .form-section {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-menu">
+        <!-- Main Menu -->
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/list}">
+                    <i class="bi bi-journal-bookmark"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/list}">
+                    <i class="bi bi-clipboard-data"></i> Assessments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/grades}">
+                    <i class="bi bi-bar-chart-line"></i> Grades
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/new}">
+                    <i class="bi bi-plus-circle"></i> Add Course
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/new}">
+                    <i class="bi bi-clipboard-plus"></i> Add Assessment
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/profile}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="header" id="header">
+    <div class="header-left">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h1 th:text="${assessment?.id} ? 'Edit Assessment' : 'Add Assessment'">Add Assessment</h1>
+    </div>
+    <div class="user-profile" onclick="location.href='/user/profile'">
+        <div class="user-details d-none d-md-block">
+            <h6 th:text="${user.name}">User Name</h6>
+            <small th:text="${user.studentNo}">Student No</small>
+            <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
+        </div>
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+        </div>
+    </div>
+</div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h2 th:text="${assessment?.id} ? 'Edit Assessment' : 'Add New Assessment'">Add New Assessment</h2>
+                <p class="text-muted">Fill in the details for your assessment</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Assessment Form -->
+            <form th:action="@{${assessment?.id} ? '/assessment/update' : '/assessment/save'}" 
+                  th:object="${assessment}" method="post" class="form-section">
+                  
+                <input type="hidden" th:field="*{id}" th:if="${assessment?.id}">
+                
+                <!-- Basic Information -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-info-circle me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-8 mb-3">
+                        <label for="name" class="form-label required-field">Assessment Name</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}" 
+                               placeholder="e.g., Midterm Exam, Final Project" required>
+                        <div class="form-text">Enter a descriptive name for the assessment</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="date" class="form-label required-field">Date</label>
+                        <input type="date" class="form-control" id="date" th:field="*{date}">
+                    </div>
+                </div>
+
+                <!-- Course Selection -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-journal-bookmark me-2"></i>Course Information
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-12 mb-3">
+                        <label for="course" class="form-label required-field">Course</label>
+                        <select class="form-select" id="course" th:field="*{course}" required>
+                            <option value="">Select a course</option>
+                            <option th:each="course : ${courses}" 
+                                    th:value="${course.id}"
+                                    th:text="${course.name + ' (' + course.code + ')'}"
+                                    th:selected="${assessment?.course?.id == course.id}">
+                            </option>
+                        </select>
+                        <div class="form-text">Select the course this assessment belongs to</div>
+                    </div>
+                </div>
+
+                <!-- Marks Information -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-percent me-2"></i>Marks & Weighting
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="weigh" class="form-label required-field">Weight (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="weigh" th:field="*{weigh}" 
+                                   min="0" max="100" step="0.1" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-text">How much this assessment contributes to the course</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="targetMark" class="form-label required-field">Target Mark (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="targetMark" th:field="*{targetMark}" 
+                                   min="0" max="100" step="0.1" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-text">Your goal for this assessment</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="actualMark" class="form-label">Actual Mark (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="actualMark" th:field="*{actualMark}" 
+                                   min="0" max="100" step="0.1">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-text">Leave blank if not yet graded</div>
+                    </div>
+                </div>
+
+                <!-- Mark Preview -->
+                <div class="mark-preview" th:if="${assessment?.actualMark}">
+                    <h6><i class="bi bi-graph-up me-2"></i>Performance Preview</h6>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between">
+                                <span>Target:</span>
+                                <span th:text="${assessment?.targetMark} + '%'" class="fw-bold text-primary"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span>Actual:</span>
+                                <span th:text="${assessment?.actualMark} + '%'" 
+                                      th:classappend="${assessment?.actualMark >= assessment?.targetMark} ? 'text-success fw-bold' : 'text-warning fw-bold'">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between">
+                                <span>Difference:</span>
+                                <span th:text="${(assessment?.actualMark - assessment?.targetMark)} + '%'"
+                                      th:classappend="${(assessment?.actualMark - assessment?.targetMark) >= 0} ? 'text-success fw-bold' : 'text-danger fw-bold'">
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span>Status:</span>
+                                <span th:if="${assessment?.actualMark >= assessment?.targetMark}" 
+                                      class="badge bg-success">Target Achieved</span>
+                                <span th:if="${assessment?.actualMark < assessment?.targetMark}" 
+                                      class="badge bg-warning">Below Target</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <a th:href="@{/assessment/list}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-save me-2"></i>
+                            <span th:text="${assessment?.id} ? 'Update Assessment' : 'Save Assessment'">Save Assessment</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            <p class="mb-0" th:text="'Logged in as: ' + ${user.name}"></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Form validation and mark calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const actualMarkInput = document.getElementById('actualMark');
+            const targetMarkInput = document.getElementById('targetMark');
+            const weightInput = document.getElementById('weigh');
+            
+            // Set minimum date to today for new assessments
+            if (!document.getElementById('date').value) {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').min = today;
+            }
+            
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const weight = parseFloat(weightInput.value);
+                const target = parseFloat(targetMarkInput.value);
+                const actual = actualMarkInput.value ? parseFloat(actualMarkInput.value) : null;
+                
+                if (weight < 0 || weight > 100) {
+                    e.preventDefault();
+                    alert('Weight must be between 0 and 100%');
+                    weightInput.focus();
+                    return false;
+                }
+                
+                if (target < 0 || target > 100) {
+                    e.preventDefault();
+                    alert('Target mark must be between 0 and 100%');
+                    targetMarkInput.focus();
+                    return false;
+                }
+                
+                if (actual !== null && (actual < 0 || actual > 100)) {
+                    e.preventDefault();
+                    alert('Actual mark must be between 0 and 100%');
+                    actualMarkInput.focus();
+                    return false;
+                }
+                
+                return true;
+            });
+        });
+    </script>
+</body>
+</html>

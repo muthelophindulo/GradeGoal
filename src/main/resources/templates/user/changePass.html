@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Password - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --info-color: #4cc9f0;
+            --warning-color: #ffd166;
+            --danger-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .password-container {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .password-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .password-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .password-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .password-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+        
+        .password-header h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .password-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .security-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .password-body {
+            padding: 2.5rem;
+        }
+        
+        .user-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            border: 2px solid #e2e6ea;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #fcfdfe;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+            background-color: white;
+        }
+        
+        .input-group {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .input-group .form-control {
+            border-radius: 12px 0 0 12px;
+            border-right: none;
+        }
+        
+        .input-group .btn {
+            border-radius: 0 12px 12px 0;
+            border: 2px solid #e2e6ea;
+            border-left: none;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group .btn:hover {
+            background-color: #e9ecef;
+            color: var(--primary-color);
+        }
+        
+        .password-strength {
+            margin-top: 0.75rem;
+        }
+        
+        .strength-meter {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+        
+        .strength-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .strength-weak {
+            background-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .strength-fair {
+            background-color: #ffd166;
+            color: #ffd166;
+        }
+        
+        .strength-good {
+            background-color: #4cc9f0;
+            color: #4cc9f0;
+        }
+        
+        .strength-strong {
+            background-color: #06d6a0;
+            color: #06d6a0;
+        }
+        
+        .password-requirements {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+            border: 1px solid #e9ecef;
+        }
+        
+        .requirements-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .requirement-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+        
+        .requirement-valid {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: #06d6a0;
+        }
+        
+        .requirement-invalid {
+            background-color: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+            font-weight: 600;
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            border: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2);
+        }
+        
+        .btn-update {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            padding: 0.85rem 2rem;
+            border-radius: 12px;
+            border: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-update:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-update:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .processing {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+        
+        .footer-note {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.85rem;
+        }
+        
+        .alert-message {
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background-color: rgba(6, 214, 160, 0.1);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+            color: #06a178;
+        }
+        
+        .alert-error {
+            background-color: rgba(247, 37, 133, 0.1);
+            border: 1px solid rgba(247, 37, 133, 0.2);
+            color: #d11a6d;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 209, 102, 0.1);
+            border: 1px solid rgba(255, 209, 102, 0.2);
+            color: #d4a52e;
+        }
+        
+        /* Password toggle animation */
+        .password-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                align-items: flex-start;
+                padding-top: 30px;
+            }
+            
+            .password-container {
+                max-width: 100%;
+            }
+            
+            .password-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .password-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .password-body {
+                padding: 1.75rem;
+            }
+            
+            .security-icon {
+                font-size: 3rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-cancel, .btn-update {
+                width: 100%;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            
+            .user-details {
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .password-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .password-header p {
+                font-size: 1rem;
+            }
+            
+            .password-body {
+                padding: 1.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        /* Animation for requirement validation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .requirement-valid .requirement-icon {
+            animation: pulse 0.5s ease;
+        }
+        
+        /* Password strength animation */
+        .strength-bar {
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="password-container">
+        <div class="password-card">
+            <!-- Header Section -->
+            <div class="password-header">
+                <div class="security-icon">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <h1>Update Password</h1>
+                <p>Secure your GradeGoal account</p>
+            </div>
+            
+            <!-- Body Section -->
+            <div class="password-body">
+                <!-- User Info -->
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+                    </div>
+                    <div class="user-details">
+                        <h6 th:text="${user.name}">John Doe</h6>
+                        <small th:text="${user.studentNo}">225004680</small>
+                    </div>
+                </div>
+                
+                <!-- Display success/error messages -->
+                <div th:if="${success}" class="alert-message alert-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span th:text="${success}">Password updated successfully!</span>
+                </div>
+                
+                <div th:if="${error}" class="alert-message alert-error">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span th:text="${error}">Error updating password. Please try again.</span>
+                </div>
+                
+                <!-- Password Update Form -->
+                <form th:action="@{/user/update-password}" method="post" id="updatePasswordForm" novalidate>
+                    <!-- Current Password -->
+                    <div class="form-group">
+                        <label for="currentPassword" class="form-label">
+                            <i class="bi bi-key"></i> Current Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="currentPassword" 
+                                   name="currentPassword" 
+                                   required
+                                   placeholder="Enter your current password"
+                                   autocomplete="current-password">
+                            <button class="btn password-toggle" type="button" id="toggleCurrentPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            Enter your current password to verify your identity.
+                        </div>
+                    </div>
+                    
+                    <!-- New Password -->
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">
+                            <i class="bi bi-lock-fill"></i> New Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="newPassword" 
+                                   name="newPassword" 
+                                   required
+                                   placeholder="Create a strong new password"
+                                   autocomplete="new-password">
+                            <button class="btn password-toggle" type="button" id="toggleNewPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Password Strength Meter -->
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-bar" id="strengthBar"></div>
+                            </div>
+                            <div class="strength-text">
+                                <span>Password Strength:</span>
+                                <span id="strengthText">None</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm New Password -->
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">
+                            <i class="bi bi-lock-fill"></i> Confirm New Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="confirmPassword" 
+                                   name="confirmPassword" 
+                                   required
+                                   placeholder="Re-enter your new password"
+                                   autocomplete="new-password">
+                            <button class="btn password-toggle" type="button" id="toggleConfirmPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text" id="passwordMatchText">
+                            Passwords must match.
+                        </div>
+                    </div>
+                    
+                    <!-- Password Requirements -->
+                    <div class="password-requirements">
+                        <div class="requirements-title">
+                            <i class="bi bi-clipboard-check"></i> Password Requirements
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon requirement-invalid" id="reqLength">
+                                <i class="bi bi-x"></i>
+                            </div>
+                            <span>At least 8 characters</span>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon requirement-invalid" id="reqUppercase">
+                                <i class="bi bi-x"></i>
+                            </div>
+                            <span>At least one uppercase letter</span>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon requirement-invalid" id="reqLowercase">
+                                <i class="bi bi-x"></i>
+                            </div>
+                            <span>At least one lowercase letter</span>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon requirement-invalid" id="reqNumber">
+                                <i class="bi bi-x"></i>
+                            </div>
+                            <span>At least one number</span>
+                        </div>
+                        
+                        <div class="requirement-item">
+                            <div class="requirement-icon requirement-invalid" id="reqSpecial">
+                                <i class="bi bi-x"></i>
+                            </div>
+                            <span>At least one special character</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CSRF Token (if using Spring Security) -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn-cancel" id="cancelButton">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn-update" id="updateButton" >
+                            <i class="bi bi-shield-check"></i> Update Password
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Footer Note -->
+                <div class="footer-note">
+                    <p>Use a strong, unique password that you don't use elsewhere.</p>
+                    <p class="mb-0">© 2024 GradeGoal Academic Tracker</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateForm = document.getElementById('updatePasswordForm');
+            const updateButton = document.getElementById('updateButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const currentPassword = document.getElementById('currentPassword');
+            const newPassword = document.getElementById('newPassword');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const passwordMatchText = document.getElementById('passwordMatchText');
+            
+            // Password toggle functionality
+            function setupPasswordToggle(passwordField, toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+                    this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+                });
+            }
+            
+            setupPasswordToggle(currentPassword, document.getElementById('toggleCurrentPassword'));
+            setupPasswordToggle(newPassword, document.getElementById('toggleNewPassword'));
+            setupPasswordToggle(confirmPassword, document.getElementById('toggleConfirmPassword'));
+            
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /[0-9]/.test(password),
+                    special: /[^A-Za-z0-9]/.test(password)
+                };
+                
+                // Update requirement icons
+                document.getElementById('reqLength').className = 
+                    `requirement-icon ${requirements.length ? 'requirement-valid' : 'requirement-invalid'}`;
+                document.getElementById('reqLength').innerHTML = 
+                    requirements.length ? '<i class="bi bi-check"></i>' : '<i class="bi bi-x"></i>';
+                
+                document.getElementById('reqUppercase').className = 
+                    `requirement-icon ${requirements.uppercase ? 'requirement-valid' : 'requirement-invalid'}`;
+                document.getElementById('reqUppercase').innerHTML = 
+                    requirements.uppercase ? '<i class="bi bi-check"></i>' : '<i class="bi bi-x"></i>';
+                
+                document.getElementById('reqLowercase').className = 
+                    `requirement-icon ${requirements.lowercase ? 'requirement-valid' : 'requirement-invalid'}`;
+                document.getElementById('reqLowercase').innerHTML = 
+                    requirements.lowercase ? '<i class="bi bi-check"></i>' : '<i class="bi bi-x"></i>';
+                
+                document.getElementById('reqNumber').className = 
+                    `requirement-icon ${requirements.number ? 'requirement-valid' : 'requirement-invalid'}`;
+                document.getElementById('reqNumber').innerHTML = 
+                    requirements.number ? '<i class="bi bi-check"></i>' : '<i class="bi bi-x"></i>';
+                
+                document.getElementById('reqSpecial').className = 
+                    `requirement-icon ${requirements.special ? 'requirement-valid' : 'requirement-invalid'}`;
+                document.getElementById('reqSpecial').innerHTML = 
+                    requirements.special ? '<i class="bi bi-check"></i>' : '<i class="bi bi-x"></i>';
+                
+                // Calculate strength
+                if (requirements.length) strength += 20;
+                if (requirements.uppercase) strength += 20;
+                if (requirements.lowercase) strength += 20;
+                if (requirements.number) strength += 20;
+                if (requirements.special) strength += 20;
+                
+                // Update strength meter
+                const strengthBar = document.getElementById('strengthBar');
+                const strengthText = document.getElementById('strengthText');
+                
+                strengthBar.style.width = `${strength}%`;
+                
+                if (strength < 40) {
+                    strengthBar.className = 'strength-bar strength-weak';
+                    strengthText.textContent = 'Weak';
+                    strengthText.className = 'strength-text';
+                    strengthText.querySelector('span:last-child').style.color = '#ff6b6b';
+                } else if (strength < 60) {
+                    strengthBar.className = 'strength-bar strength-fair';
+                    strengthText.textContent = 'Fair';
+                    strengthText.className = 'strength-text';
+                    strengthText.querySelector('span:last-child').style.color = '#ffd166';
+                } else if (strength < 80) {
+                    strengthBar.className = 'strength-bar strength-good';
+                    strengthText.textContent = 'Good';
+                    strengthText.className = 'strength-text';
+                    strengthText.querySelector('span:last-child').style.color = '#4cc9f0';
+                } else {
+                    strengthBar.className = 'strength-bar strength-strong';
+                    strengthText.textContent = 'Strong';
+                    strengthText.className = 'strength-text';
+                    strengthText.querySelector('span:last-child').style.color = '#06d6a0';
+                }
+                
+                return requirements;
+            }
+            
+            // Check if passwords match
+            function checkPasswordMatch() {
+                const newPass = newPassword.value;
+                const confirmPass = confirmPassword.value;
+                
+                if (newPass && confirmPass) {
+                    if (newPass === confirmPass) {
+                        passwordMatchText.innerHTML = '<span style="color:#06d6a0;"><i class="bi bi-check-circle-fill"></i> Passwords match!</span>';
+                        return true;
+                    } else {
+                        passwordMatchText.innerHTML = '<span style="color:#f72585;"><i class="bi bi-x-circle-fill"></i> Passwords do not match!</span>';
+                        return false;
+                    }
+                } else {
+                    passwordMatchText.textContent = 'Passwords must match.';
+                    return false;
+                }
+            }
+            
+            // Update button state
+            function updateButtonState() {
+                const currentPass = currentPassword.value.trim();
+                const newPass = newPassword.value.trim();
+                const confirmPass = confirmPassword.value.trim();
+                
+                // Check all requirements
+                const requirements = checkPasswordStrength(newPass);
+                const allRequirementsMet = Object.values(requirements).every(req => req);
+                const passwordsMatch = checkPasswordMatch();
+                
+                // Enable button only if all conditions are met
+                updateButton.disabled = !(currentPass && newPass && confirmPass && 
+                                        allRequirementsMet && passwordsMatch);
+                
+                // Visual feedback
+                if (updateButton.disabled) {
+                    updateButton.title = "Please fill all fields and meet password requirements";
+                } else {
+                    updateButton.title = "Click to update your password";
+                }
+            }
+            
+            // Event listeners for real-time validation
+            currentPassword.addEventListener('input', updateButtonState);
+            newPassword.addEventListener('input', updateButtonState);
+            confirmPassword.addEventListener('input', updateButtonState);
+            
+            // Form submission handler
+            updateForm.addEventListener('submit', function(event) {
+                // Final validation
+                const requirements = checkPasswordStrength(newPassword.value);
+                const allRequirementsMet = Object.values(requirements).every(req => req);
+                const passwordsMatch = checkPasswordMatch();
+                
+                if (!allRequirementsMet) {
+                    event.preventDefault();
+                    showAlert('Please meet all password requirements before submitting.', 'warning');
+                    return;
+                }
+                
+                if (!passwordsMatch) {
+                    event.preventDefault();
+                    showAlert('Passwords do not match. Please confirm your new password.', 'warning');
+                    return;
+                }
+                
+                // Check if new password is same as current
+                if (currentPassword.value === newPassword.value) {
+                    event.preventDefault();
+                    showAlert('New password cannot be the same as your current password.', 'warning');
+                    return;
+                }
+                
+                // Show processing state
+                updateButton.innerHTML = '<i class="bi bi-arrow-repeat"></i> Updating...';
+                updateButton.classList.add('processing');
+                updateButton.disabled = true;
+                cancelButton.disabled = true;
+                
+                // Add slight delay for visual feedback
+                setTimeout(() => {
+                    updateButton.innerHTML = '<i class="bi bi-shield-check"></i> Update Password';
+                }, 1500);
+            });
+            
+            // Cancel button handler
+            cancelButton.addEventListener('click', function() {
+                if (currentPassword.value || newPassword.value || confirmPassword.value) {
+                    if (confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+                        window.location.href = '/dashboard';
+                    }
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            });
+            
+            // Show alert function
+            function showAlert(message, type) {
+                // Remove any existing alerts
+                const existingAlert = document.querySelector('.custom-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                // Create alert element
+                const alertEl = document.createElement('div');
+                alertEl.className = `custom-alert alert alert-${type} alert-dismissible fade show`;
+                alertEl.style.position = 'fixed';
+                alertEl.style.top = '20px';
+                alertEl.style.right = '20px';
+                alertEl.style.zIndex = '9999';
+                alertEl.style.maxWidth = '400px';
+                alertEl.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                alertEl.innerHTML = `
+                    <strong>${type === 'warning' ? 'Warning' : 'Error'}:</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(alertEl);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertEl.parentNode) {
+                        alertEl.classList.remove('show');
+                        setTimeout(() => alertEl.remove(), 150);
+                    }
+                }, 5000);
+            }
+            
+            // Initialize button state
+            updateButtonState();
+            
+            // Add visual feedback for password fields
+            [currentPassword, newPassword, confirmPassword].forEach(field => {
+                field.addEventListener('focus', function() {
+                    this.parentElement.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.parentElement.style.transition = 'transform 0.2s ease';
+                });
+                
+                field.addEventListener('blur', function() {
+                    this.parentElement.parentElement.style.transform = '';
+                });
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl + Enter to submit
+                if (e.ctrlKey && e.key === 'Enter' && !updateButton.disabled) {
+                    updateForm.submit();
+                }
+                
+                // Escape to cancel
+                if (e.key === 'Escape') {
+                    if (currentPassword.value || newPassword.value || confirmPassword.value) {
+                        if (confirm("You have unsaved changes. Cancel password update?")) {
+                            window.location.href = '/dashboard';
+                        }
+                    }
+                }
+            });
+            
+            // Prevent accidental navigation
+            window.addEventListener('beforeunload', function(e) {
+                if (currentPassword.value || newPassword.value || confirmPassword.value) {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved password changes. Are you sure you want to leave?';
+                    return e.returnValue;
+                }
+            });
+            
+            // Example strong password suggestion
+            function generateStrongPassword() {
+                const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+                const lowercase = 'abcdefghijkmnpqrstuvwxyz';
+                const numbers = '23456789';
+                const special = '!@#$%^&*';
+                
+                let password = '';
+                
+                // Ensure at least one of each type
+                password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+                password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+                password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                password += special.charAt(Math.floor(Math.random() * special.length));
+                
+                // Fill remaining to make 12 characters
+                const allChars = uppercase + lowercase + numbers + special;
+                for (let i = password.length; i < 12; i++) {
+                    password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+                }
+                
+                // Shuffle the password
+                password = password.split('').sort(() => Math.random() - 0.5).join('');
+                
+                return password;
+            }
+            
+            // Add suggestion button (optional)
+            const suggestButton = document.createElement('button');
+            suggestButton.type = 'button';
+            suggestButton.className = 'btn btn-sm btn-outline-info mt-2';
+            suggestButton.innerHTML = '<i class="bi bi-lightbulb"></i> Suggest a strong password';
+            suggestButton.addEventListener('click', function() {
+                const strongPassword = generateStrongPassword();
+                newPassword.value = strongPassword;
+                confirmPassword.value = strongPassword;
+                
+                // Trigger validation
+                newPassword.dispatchEvent(new Event('input'));
+                confirmPassword.dispatchEvent(new Event('input'));
+                
+                // Show all passwords temporarily
+                newPassword.type = 'text';
+                confirmPassword.type = 'text';
+                setTimeout(() => {
+                    newPassword.type = 'password';
+                    confirmPassword.type = 'password';
+                }, 3000);
+                
+                showAlert('A strong password has been generated and filled. Make sure to save it securely!', 'success');
+            });
+            
+            // Insert after new password field
+            newPassword.parentElement.parentElement.appendChild(suggestButton);
+        });
+    </script>
+</body>
+</html>

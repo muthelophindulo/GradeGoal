@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${course?.id} ? 'Edit Course' : 'Add Course'">Add Course - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px; /* Space for fixed header */
+        }
+        
+        /* Fixed Header - ALWAYS STICKY */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Form Container */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .form-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .form-help-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        /* Course grade indicator */
+        .course-grade-indicator {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            margin: 0 auto;
+        }
+        
+        .grade-a { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .grade-b { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
+        .grade-c { background: linear-gradient(135deg, #ffd166, #f9c74f); }
+        .grade-d { background: linear-gradient(135deg, #ff9a76, #ff6b6b); }
+        .grade-f { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* RESPONSIVE BREAKPOINTS */
+        
+        /* Tablets and small desktops (lg and below) */
+        @media (max-width: 1199.98px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+        }
+        
+        /* Mobile and tablets (md and below) */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-profile .user-details {
+                display: none;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .form-container {
+                max-width: 100%;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+        }
+        
+        /* Small mobile devices (sm and below) */
+        @media (max-width: 767.98px) {
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .form-section {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            
+            .course-grade-indicator {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Extra small mobile devices (xs) */
+        @media (max-width: 575.98px) {
+            .header-left {
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .menu-toggle {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--Header -->
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1 th:text="${course?.id} ? 'Edit Course' : 'Add Course'">Add Course</h1>
+        </div>
+        <div class="user-profile" onclick="location.href='/user/profile'">
+            <div class="user-details d-none d-md-block">
+                <h6 th:text="${user.name}">User Name</h6>
+                <small th:text="${user.studentNo}">Student No</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="form-container">
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h2 th:text="${course?.id} ? 'Edit Course' : 'Add New Course'">Add New Course</h2>
+                <p class="text-muted">Fill in the course details to track your progress</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Course Form -->
+            <form th:action="@{${course?.id} ? '/course/update' : '/course/save'}" 
+                  th:object="${course}" method="post" class="form-section">
+                  
+                <input type="hidden" th:field="*{id}" th:if="${course?.id}">
+                <input type="hidden" th:field="*{user}" th:value="${user.id}">
+                
+                <!-- Basic Information -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-info-circle me-2"></i>Course Information
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-8 mb-3">
+                        <label for="name" class="form-label required-field">Course Name</label>
+                        <input type="text" class="form-control" id="name" th:field="*{name}" 
+                               placeholder="e.g., Data Structures & Algorithms" required>
+                        <div class="form-help-text">Enter the full name of the course</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="code" class="form-label required-field">Course Code</label>
+                        <input type="text" class="form-control" id="code" th:field="*{code}" 
+                               placeholder="e.g., CS201" required>
+                        <div class="form-help-text">University course code</div>
+                    </div>
+                </div>
+
+                <!-- Marks Configuration -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-percent me-2"></i>Marks Configuration
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="passMark" class="form-label required-field">Pass Mark (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="passMark" th:field="*{passMark}" 
+                                   min="0" max="100" step="0.1" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-help-text">Minimum passing grade (default: 40%)</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="targetMark" class="form-label">Target Mark (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="targetMark" th:field="*{TargetMark}" 
+                                   min="0" max="100" step="0.1">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-help-text">Your personal goal for this course (optional)</div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="actualMark" class="form-label">Current Mark (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="actualMark" th:field="*{ActualMark}" 
+                                   min="0" max="100" step="0.1">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-help-text">Your current grade (leave blank if not started)</div>
+                    </div>
+                </div>
+
+                <!-- Semester and Year -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-calendar me-2"></i>Semester Information
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="semester" class="form-label">Semester</label>
+                        <select class="form-select" id="semester" th:field="*{semester}">
+                            <option value="1">Select Semester</option>
+                            <option value="1" >Semester 1</option>
+                            <option value="2">Semester 2</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <input type="number" class="form-control" id="year" th:field="*{year}" 
+                               min="2020" max="2030" placeholder="e.g., 2025">
+                    </div>
+                </div>
+
+                <!-- Mark Preview -->
+                <div class="row mb-4" th:if="${course?.ActualMark != null}">
+                    <div class="col-12">
+                        <div class="alert" th:classappend="${course?.ActualMark >= course?.passMark} ? 'alert-success' : 'alert-warning'">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="alert-heading">
+                                        <i class="bi" th:classappend="${course?.ActualMark >= course?.passMark} ? 'bi-check-circle' : 'bi-exclamation-triangle'"></i>
+                                        <span th:text="${course?.ActualMark >= course?.passMark} ? 'Course is Passing' : 'Course Needs Improvement'"></span>
+                                    </h6>
+                                    <div class="row mt-2">
+                                        <div class="col-4">
+                                            <small>Pass Mark:</small>
+                                            <div class="fw-bold" th:text="${course?.passMark} + '%'"></div>
+                                        </div>
+                                        <div class="col-4">
+                                            <small>Your Mark:</small>
+                                            <div class="fw-bold" th:text="${course?.ActualMark} + '%'"></div>
+                                        </div>
+                                        <div class="col-4">
+                                            <small>Difference:</small>
+                                            <div class="fw-bold" th:text="${course?.ActualMark - course?.passMark} + '%'"
+                                                 th:classappend="${(course?.ActualMark - course?.passMark) >= 0} ? 'text-success' : 'text-danger'"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DP Field-->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="form-header">
+                            <i class="bi bi-percent me-2"></i>Degree Performance (DP)
+                        </h5>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="dp" class="form-label">DP Requirement (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="dp" th:field="*{dp}" 
+                                   min="0" max="100" step="0.1" value="40">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="form-help-text">Minimum DP required for this course (default: 40%)</div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="row mt-4">
+                    <div class="col-6 col-md-4">
+                        <a th:href="@{/course/list}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button type="reset" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-4 mt-3 mt-md-0">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-save me-2"></i>
+                            <span th:text="${course?.id} ? 'Update Course' : 'Save Course'">Save Course</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Quick Tips -->
+            <div class="form-section">
+                <h5 class="form-header">
+                    <i class="bi bi-lightbulb me-2"></i>Tips for Course Management
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-check2-circle text-success me-2 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1">Set Realistic Targets</h6>
+                                <p class="text-muted small mb-0">Set achievable target marks based on your previous performance.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-graph-up text-primary me-2 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1">Track Progress</h6>
+                                <p class="text-muted small mb-0">Regularly update your actual marks to track your progress.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-calendar-check text-warning me-2 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1">Plan Assessments</h6>
+                                <p class="text-muted small mb-0">Add assessments to this course to break down your grade.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a th:href="@{/assessment/new}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Add Assessment Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer mt-4">
+            <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            <p class="mb-0" th:text="'Logged in as: ' + ${user.name}"></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const passMarkInput = document.getElementById('passMark');
+            const targetMarkInput = document.getElementById('targetMark');
+            const actualMarkInput = document.getElementById('actualMark');
+            const dpInput = document.getElementById('dp');
+            
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const passMark = parseFloat(passMarkInput.value);
+                const target = targetMarkInput.value ? parseFloat(targetMarkInput.value) : null;
+                const actual = actualMarkInput.value ? parseFloat(actualMarkInput.value) : null;
+                const dp = dpInput.value ? parseFloat(dpInput.value) : 40;
+                
+                // Validate pass mark
+                if (passMark < 0 || passMark > 100) {
+                    e.preventDefault();
+                    alert('Pass mark must be between 0 and 100%');
+                    passMarkInput.focus();
+                    return false;
+                }
+                
+                // Validate target mark
+                if (target !== null && (target < 0 || target > 100)) {
+                    e.preventDefault();
+                    alert('Target mark must be between 0 and 100%');
+                    targetMarkInput.focus();
+                    return false;
+                }
+                
+                // Validate actual mark
+                if (actual !== null && (actual < 0 || actual > 100)) {
+                    e.preventDefault();
+                    alert('Actual mark must be between 0 and 100%');
+                    actualMarkInput.focus();
+                    return false;
+                }
+                
+                // Validate DP
+                if (dp < 0 || dp > 100) {
+                    e.preventDefault();
+                    alert('DP must be between 0 and 100%');
+                    dpInput.focus();
+                    return false;
+                }
+                
+                // Validate target is above pass mark
+                if (target !== null && target < passMark) {
+                    if (!confirm('Your target mark is below the pass mark. Are you sure?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            // Live validation feedback
+            function validateMarks() {
+                const passMark = parseFloat(passMarkInput.value);
+                const target = targetMarkInput.value ? parseFloat(targetMarkInput.value) : null;
+                const actual = actualMarkInput.value ? parseFloat(actualMarkInput.value) : null;
+                const dp = dpInput.value ? parseFloat(dpInput.value) : 40;
+                
+                // Validate pass mark
+                if (passMark < 0 || passMark > 100) {
+                    passMarkInput.classList.add('is-invalid');
+                } else {
+                    passMarkInput.classList.remove('is-invalid');
+                }
+                
+                // Validate target mark
+                if (target !== null && (target < 0 || target > 100)) {
+                    targetMarkInput.classList.add('is-invalid');
+                } else {
+                    targetMarkInput.classList.remove('is-invalid');
+                }
+                
+                // Validate actual mark
+                if (actual !== null && (actual < 0 || actual > 100)) {
+                    actualMarkInput.classList.add('is-invalid');
+                } else {
+                    actualMarkInput.classList.remove('is-invalid');
+                }
+                
+                // Validate DP
+                if (dp < 0 || dp > 100) {
+                    dpInput.classList.add('is-invalid');
+                } else {
+                    dpInput.classList.remove('is-invalid');
+                }
+            }
+            
+            // Add validation on input
+            passMarkInput.addEventListener('input', validateMarks);
+            targetMarkInput.addEventListener('input', validateMarks);
+            actualMarkInput.addEventListener('input', validateMarks);
+            dpInput.addEventListener('input', validateMarks);
+            
+            // Course code auto-formatting
+            const codeInput = document.getElementById('code');
+            if (codeInput) {
+                codeInput.addEventListener('input', function() {
+                    // Convert to uppercase
+                    this.value = this.value.toUpperCase();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

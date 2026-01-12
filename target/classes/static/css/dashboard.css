@@ -1,0 +1,306 @@
+/* Dashboard Page Specific Styles */
+
+/* Dashboard Layout */
+.dashboard-body {
+    background-color: #f5f7fb;
+    color: #333;
+    overflow-x: hidden;
+    padding-top: 90px; /* Space for fixed header */
+}
+
+/* Header */
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    background: white;
+    border-radius: 0 0 15px 15px;
+    padding: 20px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: none;
+}
+
+.dashboard-header h1 {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+    background: #f8f9fa;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.user-details {
+    text-align: right;
+}
+
+.user-details h6 {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-details small {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.degree-badge {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 0 20px 30px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.sidebar-header h3 i {
+    color: #4cc9f0;
+}
+
+.close-sidebar {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.nav-item {
+    margin-bottom: 5px;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 25px;
+    border-radius: 0 30px 30px 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #4cc9f0;
+}
+
+.nav-link i {
+    font-size: 1.2rem;
+    width: 25px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 30px 20px 20px;
+    transition: all 0.3s ease;
+    min-height: calc(100vh - 90px);
+}
+
+/* Welcome Banner */
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 15px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text h2 {
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.welcome-text p {
+    opacity: 0.9;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.welcome-icon {
+    font-size: 3.5rem;
+    opacity: 0.2;
+}
+
+/* Stats Cards */
+.stats-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.stats-icon.course {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.stats-icon.assessment {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success-color);
+}
+
+.stats-icon.grade {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--warning-color);
+}
+
+.stats-icon.degree {
+    background: rgba(58, 12, 163, 0.1);
+    color: var(--secondary-color);
+}
+
+.stats-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stats-text {
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.stats-subtext {
+    color: #adb5bd;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Add more dashboard-specific styles from your dashboard template */
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    /* Add responsive styles for dashboard */
+}
+
+/* You'll need to add the rest of the dashboard styles from our previous template */

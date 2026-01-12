@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px;
+        }
+        
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Profile Container */
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Profile Header */
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .profile-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .profile-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .profile-title {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Profile Cards */
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .card-header i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 12px;
+        }
+        
+        .card-header h4 {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        /* Academic Progress */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-item {
+            margin-bottom: 15px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar-container {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        /* Badge Styles */
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .badge-success {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success-color);
+        }
+        
+        .badge-warning {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--warning-color);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-edit {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-change-password {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete-account {
+            background: red;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-change-password:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-profile .user-details {
+                display: none;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+            
+            .profile-header {
+                padding: 30px 20px;
+            }
+            
+            .profile-name {
+                font-size: 1.8rem;
+            }
+            
+            .profile-stats {
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .profile-header {
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin: 0 auto 20px;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .profile-card {
+                padding: 20px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-edit, .btn-change-password {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>My Profile</h1>
+        </div>
+        <div class="user-profile" onclick="location.href='/user/profile'">
+            <div class="user-details d-none d-md-block">
+                <h6 th:text="${user.name}">User Name</h6>
+                <small th:text="${user.studentNo}">Student No</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="profile-container">
+            
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+                </div>
+                <h1 class="profile-name" th:text="${user.name}">John Doe</h1>
+                <p class="profile-title" th:text="${user.degree?.name} + ' Student'">Computer Science Student</p>
+                <p class="profile-title" th:text="'Student No: ' + ${user.studentNo}">STU2024001</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalCourses}">12</div>
+                        <div class="stat-label">Courses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${completedCourses}">8</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${averageGrade} + '%'">85.5%</div>
+                        <div class="stat-label">Avg Grade</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalAssessments}">42</div>
+                        <div class="stat-label">Assessments</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a th:href="@{/user/settings}" class="btn-edit">
+                    <i class="bi bi-pencil-square"></i> Edit Profile
+                </a>
+                <a th:href="@{/user/change-password}" class="btn-change-password">
+                    <i class="bi bi-key"></i> Change Password
+                </a>
+                <a th:href="@{/user/delete-account}" class="btn-delete-account">
+                    <i class="bi bi-trash"></i> Delete Account
+                </a>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="bi bi-person-badge"></i>
+                    <h4>Personal Information</h4>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Full Name</div>
+                        <div class="info-value" th:text="${user.name}">John Doe</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Email Address</div>
+                        <div class="info-value" th:text="${user.email}">john.doe@university.edu</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Student Number</div>
+                        <div class="info-value" th:text="${user.studentNo}">STU2024001</div>
+                    </div>
+                    <!--
+                    <div class="info-item">
+                        <div class="info-label">Date of Birth</div>
+                        <div class="info-value" th:text="${#temporals.format(user.dateOfBirth, 'dd MMMM yyyy')}">15 January 2000</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-value" th:text="${user.phone}">+1 (555) 123-4567</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Joined Date</div>
+                        <div class="info-value" th:text="${#temporals.format(user.createdAt, 'dd MMMM yyyy')}">15 January 2024</div>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="bi bi-mortarboard"></i>
+                    <h4>Academic Information</h4>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Degree Program</div>
+                        <div class="info-value" th:text="${user.degree?.name}">Bachelor of Computer Science</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Faculty</div>
+                        <div class="info-value" th:text="${user.degree?.faculty}">Faculty of Science</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Year of Study</div>
+                        <div class="info-value" th:text="${yearOfStudy}">Year 3</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Current GPA</div>
+                        <div class="info-value" th:text="${gpa}">3.75</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Total Credits</div>
+                        <div class="info-value" th:text="${user.degree?.totalCredits}">120</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Expected Graduation</div>
+                        <div class="info-value" th:text="${graduationYear}">May 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Progress -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <h4>Academic Progress</h4>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Course Completion</span>
+                            <span th:text="${courseCompletionRate} + '%'">75%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" th:style="'width: ' + ${courseCompletionRate} + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Assessment Completion</span>
+                            <span th:text="${assessmentCompletionRate} + '%'">68%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" th:style="'width: ' + ${assessmentCompletionRate} + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Target Achievement</span>
+                            <span th:text="${targetAchievementRate} + '%'">82%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" th:style="'width: ' + ${targetAchievementRate} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements & Badges -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="bi bi-award"></i>
+                    <h4>Achievements & Badges</h4>
+                </div>
+                <div class="badge-container">
+                    <span class="badge badge-primary">
+                        <i class="bi bi-star me-1"></i>Consistent Performer
+                    </span>
+                    <span class="badge badge-success">
+                        <i class="bi bi-check-circle me-1"></i>Perfect Attendance
+                    </span>
+                    <span class="badge badge-warning">
+                        <i class="bi bi-lightning me-1"></i>Fast Learner
+                    </span>
+                    <span class="badge badge-primary">
+                        <i class="bi bi-trophy me-1"></i>Top 10% Student
+                    </span>
+                    <span class="badge badge-success">
+                        <i class="bi bi-calendar-check me-1"></i>Early Bird
+                    </span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Animate progress bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
