@@ -42,7 +42,7 @@ public class GradesController {
         model.addAttribute("totalCourses", allCourses.size());
         
         // Calculate average grade
-        double avgGrade = userService.AverageGrade(loggedinuser);
+        double avgGrade = courseService.AverageGrade(loggedinuser);
         model.addAttribute("averageGrade", String.format("%.1f", avgGrade));
         
         // Completed assessments count

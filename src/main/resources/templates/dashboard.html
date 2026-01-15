@@ -689,6 +689,24 @@
             font-size: 0.85rem;
             color: #6c757d;
         }
+
+        .progress-on-track {
+    background: linear-gradient(90deg, #4ecdc4, #44a08d) !important;
+}
+
+.progress-at-risk {
+    background: linear-gradient(90deg, #ffd166, #f9c74f) !important;
+}
+
+.progress-behind {
+    background: linear-gradient(90deg, #ff6b6b, #ee5a52) !important;
+}
+
+.goal-progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
         
         /* Footer */
         .footer {
@@ -998,71 +1016,84 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
-            <button class="close-sidebar" id="closeSidebar">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        
-        <div class="sidebar-menu">
-            <!-- Main Menu -->
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" th:href="@{/dashboard}">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/course/list}">
-                        <i class="bi bi-journal-bookmark"></i> My Courses
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/assessment/list}">
-                        <i class="bi bi-clipboard-data"></i> Assessments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/grades}">
-                        <i class="bi bi-bar-chart-line"></i> Grades
-                    </a>
-                </li>
-                
-                <li class="nav-item mt-4">
-                    <hr class="text-white opacity-25 mx-3">
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/course/new}">
-                        <i class="bi bi-plus-circle"></i> Add Course
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/assessment/new}">
-                        <i class="bi bi-clipboard-plus"></i> Add Assessment
-                    </a>
-                </li>
-                
-                <li class="nav-item mt-4">
-                    <hr class="text-white opacity-25 mx-3">
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/user/profile}">
-                        <i class="bi bi-person-circle"></i> Profile
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/logout}">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-menu">
+        <!-- Main Menu -->
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <!-- ADDED: My Goals Menu Item -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/list}">
+                    <i class="bi bi-bullseye"></i> My Goals
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/list}">
+                    <i class="bi bi-journal-bookmark"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/list}">
+                    <i class="bi bi-clipboard-data"></i> Assessments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/grades}">
+                    <i class="bi bi-bar-chart-line"></i> Grades
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <!-- ADDED: Add Goal Menu Item -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/new}">
+                    <i class="bi bi-plus-circle"></i> Add Goal
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/new}">
+                    <i class="bi bi-plus-circle"></i> Add Course
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/new}">
+                    <i class="bi bi-clipboard-plus"></i> Add Assessment
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/profile}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
     <div class="header" id="header">
         <div class="header-left">
@@ -1157,8 +1188,26 @@
                         <div class="course-grade" th:text="${course.actualMark}">92%</div>
                     </div>
                     <div class="text-center mt-3 pt-3 border-top">
-                        <a th:href="@{/course/courses/list}" class="btn btn-sm btn-outline-primary">
+                        <a th:href="@{/courses/list}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-eye me-1"></i>View All Courses
+                        </a>
+                    </div>
+                </div>
+                <!--2. Top Assessments Widget -->
+                <div class="top-courses-card">
+                    <h5><i class="bi bi-trophy"></i> Top Assessments</h5>
+
+                    <div th:each="assessment,stat : ${assessments}" class="course-rank-item">
+                        <div class="rank-number rank-1" th:class=" 'rank-number rank-'+${stat.count} " th:text="${stat.count}">1</div>
+                        <div class="course-info">
+                            <div class="course-name" th:text="${assessment.name}">Data Structures & Algorithms</div>
+                            <div class="course-code" th:text="${assessment.course?.code}">CS201</div>
+                        </div>
+                        <div class="course-grade" th:text="${assessment.actualMark}">92%</div>
+                    </div>
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <a th:href="@{/assessment/list}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i>View All Assessments
                         </a>
                     </div>
                 </div>
@@ -1166,59 +1215,88 @@
                 <!-- 2. Academic Goals Widget (SECOND) -->
                 <div class="goals-card">
                     <h5><i class="bi bi-bullseye"></i> Academic Goals</h5>
-                    
-                    <div class="goal-item">
-                        <div class="goal-header">
-                            <span class="goal-label">Semester GPA</span>
-                            <span class="goal-value">3.7 / 4.0</span>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="goal-progress-bar" style="width: 82%; background: linear-gradient(90deg, #4361ee, #3a0ca3);"></div>
-                        </div>
-                        <div class="goal-subtext">
-                            <span>Current: 3.45</span>
-                            <span>Need: +0.25</span>
+
+                    <!-- Display goals from database -->
+                    <div th:if="${goals != null && !goals.isEmpty()}">
+                        <div class="goal-item" th:each="goal : ${goals}">
+                            <div class="goal-header">
+                                <span class="goal-label" th:text="${goal.name}">Semester GPA</span>
+                                <span class="goal-value">
+                    <span th:text="${goal.actual}">3.7</span> /
+                    <span th:text="${goal.target}">4.0</span>
+                    <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                </span>
+                            </div>
+                            <div class="goal-progress">
+                                <div class="progress-header">
+                                    <span class="progress-label">Progress</span>
+                                    <span class="progress-percentage">
+            <span th:with="percentage=${goal.actual > 0 ? ((goal.actual / goal.target) * 100) : 0}"
+                  th:text="${#numbers.formatDecimal(percentage, 0, 0)}">0</span>%
+        </span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div th:with="
+             percentage=${goal.actual > 0 ? ((goal.actual / goal.target) * 100) : 0},
+             gradient=${goal.actual > 0 ?
+                      ((goal.actual / goal.target) * 100 >= 75 ? 'linear-gradient(90deg, #4ecdc4, #44a08d)' :
+                       ((goal.actual / goal.target) * 100 >= 50 ? 'linear-gradient(90deg, #ffd166, #f9c74f)' :
+                        'linear-gradient(90deg, #ff6b6b, #ee5a52)')) :
+                      'linear-gradient(90deg, #ff6b6b, #ee5a52)'}"
+                                         th:style="'width: ' + ${percentage} + '%; background: ' + ${gradient}"
+                                         class="goal-progress-bar">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="goal-subtext">
+                <span>
+                    Current:
+                    <span th:text="${goal.actual}">3.45</span>
+                    <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                </span>
+                                <span>
+                    Need:
+                    <span th:if="${goal.target - goal.actual > 0}">+</span>
+                    <span th:text="${#numbers.formatDecimal(goal.target - goal.actual, 1, 2)}">0.25</span>
+                    <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                </span>
+                            </div>
+                            <!-- Additional goal info -->
+                            <div class="goal-meta">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(goal.endDate, 'MMM dd')}">Apr 15</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-flag me-1"></i>
+                                    <span th:text="${#strings.capitalize(goal.priority)}">Medium</span>
+                                    <span th:if="${goal.isOverdue}" class="text-danger ms-2">
+                        <i class="bi bi-exclamation-triangle"></i> Overdue
+                    </span>
+                                    <span th:unless="${goal.isOverdue}" class="ms-2">
+                        <span th:text="${goal.daysRemaining}">30</span> days left
+                    </span>
+                                </small>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="goal-item">
-                        <div class="goal-header">
-                            <span class="goal-label">Course Progress</span>
-                            <span class="goal-value">3 / 5</span>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="goal-progress-bar" style="width: 60%; background: linear-gradient(90deg, #4cc9f0, #2a9d8f);"></div>
-                        </div>
-                        <div class="goal-subtext">
-                            <span>2 courses left</span>
-                            <span>60% complete</span>
-                        </div>
+
+                    <!-- Empty state -->
+                    <div th:if="${goals == null || goals.isEmpty()}" class="text-center py-4">
+                        <i class="bi bi-bullseye display-4 text-muted mb-3"></i>
+                        <p class="text-muted">No goals set yet</p>
+                        <p class="text-muted small mb-3">Set academic goals to track your progress</p>
                     </div>
-                    
-                    <div class="goal-item">
-                        <div class="goal-header">
-                            <span class="goal-label">Grade Target</span>
-                            <span class="goal-value">78% / 85%</span>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="goal-progress-bar" style="width: 91%; background: linear-gradient(90deg, #f72585, #ff6b6b);"></div>
-                        </div>
-                        <div class="goal-subtext">
-                            <span>+7% needed</span>
-                            <span>91% to target</span>
-                        </div>
-                    </div>
-                    
+
                     <div class="text-center mt-3 pt-3 border-top">
-                        <button class="btn btn-sm btn-outline-primary">
+                        <a th:href="@{/goals/new}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-plus-circle me-1"></i>Set New Goal
-                        </button>
+                        </a>
                     </div>
                 </div>
 
         <!-- Footer -->
         <div class="footer">
-            <p>© 2024 GradeGoal Academic Tracker. All rights reserved.</p>
+            <p>© 2026 GradeGoal Academic Tracker. All rights reserved.</p>
             <p class="mb-0" th:text="'Logged in as: ' + ${user.name}">Logged in as: John Doe</p>
         </div>
     </div>

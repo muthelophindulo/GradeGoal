@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? 'Edit Goal' : 'Add Goal'}">Add Goal - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            padding-top: 90px;
+            overflow-x: hidden;
+        }
+        
+        /* Fixed Header */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .header-left h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-menu:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-name {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-role {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+        
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+        
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .nav-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+            list-style: none;
+        }
+        
+        .nav-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .nav-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        /* Goal Type Cards */
+        .goal-type-container {
+            margin-bottom: 40px;
+        }
+        
+        .goal-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .goal-type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            height: 100%;
+        }
+        
+        .goal-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .goal-type-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(67, 97, 238, 0.03);
+        }
+        
+        .goal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .goal-icon.gpa {
+            color: var(--primary-color);
+        }
+        
+        .goal-icon.grade {
+            color: var(--warning-color);
+        }
+        
+        /* Forms - Initially Hidden */
+        #gpaFormContainer, #gradeFormContainer {
+            display: none;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-header {
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--warning-color);
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .back-to-selection {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .back-to-selection:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+        
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 991.98px) {
+            .main-header {
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+            
+            body {
+                padding-top: 75px;
+            }
+            
+            .header-left h1 {
+                font-size: 1.5rem;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .close-sidebar {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .main-header {
+                padding: 12px 15px;
+            }
+            
+            .header-left h1 {
+                font-size: 1.3rem;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                padding: 15px 10px;
+            }
+            
+            .goal-type-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .goal-type-card, .form-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="nav-menu">
+            <!-- Main Menu -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/list}">
+                    <i class="bi bi-bullseye"></i> My Goals
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/list}">
+                    <i class="bi bi-journal-bookmark"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/list}">
+                    <i class="bi bi-clipboard-data"></i> Assessments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/grades}">
+                    <i class="bi bi-bar-chart-line"></i> Grades
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/goals/new}">
+                    <i class="bi bi-plus-circle"></i> Add Goal
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/new}">
+                    <i class="bi bi-plus-circle"></i> Add Course
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/new}">
+                    <i class="bi bi-clipboard-plus"></i> Add Assessment
+                </a>
+            </li>
+
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/profile}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </div>
+    </nav>
+
+    <header class="main-header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1 th:text="${isEdit ? 'Edit Goal' : 'Add Goal'}">Add Goal</h1>
+        </div>
+        <div class="user-menu" onclick="location.href='/user/profile'">
+            <div class="user-info d-none d-md-block">
+                <h6 class="user-name" th:text="${user.name}">John Doe</h6>
+                <small class="user-role" th:text="${user.studentNo}">S001</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2 th:text="${isEdit ? 'Edit Goal' : 'Set New Goal'}">Set New Goal</h2>
+            <p>Choose a goal type and define your academic target. Goals help you stay focused and track your progress.</p>
+        </div>
+
+        <!-- Goal Type Selection (Only shown when no type selected) -->
+        <div id="typeSelection">
+            <div class="goal-type-container">
+                <h4 class="mb-4">Select Goal Type</h4>
+                <div class="goal-type-grid">
+                    <!-- GPA Goal -->
+                    <div class="goal-type-card" id="gpaCard">
+                        <div class="goal-icon gpa">
+                            <i class="bi bi-award-fill"></i>
+                        </div>
+                        <h4 class="card-title">GPA Target</h4>
+                        <p class="card-text">
+                            Achieve a specific GPA for a semester or overall degree.
+                            Track your progress towards achieving your desired GPA.
+                        </p>
+                        <div class="goal-type-examples">
+                            <small class="text-muted">Examples: Achieve 3.5 GPA this semester, Reach 3.7 cumulative GPA</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Overall Grade Goal -->
+                    <div class="goal-type-card" id="gradeCard">
+                        <div class="goal-icon grade">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h4 class="card-title">Overall Grade</h4>
+                        <p class="card-text">
+                            Achieve a specific average grade across all courses.
+                            Monitor your performance and work towards your target grade.
+                        </p>
+                        <div class="goal-type-examples">
+                            <small class="text-muted">Examples: Maintain 80% average, Improve to 75% overall</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPA Goal Form -->
+        <div id="gpaFormContainer">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0 text-primary">
+                            <i class="bi bi-award-fill me-2"></i>
+                            GPA Goal Details
+                        </h3>
+                        <span class="back-to-selection" onclick="backToSelection()">
+                            <i class="bi bi-arrow-left me-1"></i>Change Goal Type
+                        </span>
+                    </div>
+                    <p class="mb-0 text-muted">Define your GPA target and timeline</p>
+                </div>
+
+                <form th:action="${isEdit ? '/goals/update' : '/goals/save'}" method="post" th:object="${goal}" id="gpaForm">
+                    <!-- Hidden Fields -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="goalType" value="gpa" />
+                    
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="gpaName" class="form-label required">Goal Name</label>
+                                <input type="text" class="form-control" th:field="*{name}" 
+                                       id="gpaName" placeholder="e.g., Achieve 3.5 GPA this semester" required>
+                                <div class="form-text">Give your goal a descriptive name</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="gpaPriority" class="form-label required">Priority</label>
+                                <select class="form-select" th:field="*{priority}" id="gpaPriority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gpaDescription" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" th:field="*{description}" 
+                                      id="gpaDescription" rows="3" 
+                                      placeholder="Describe your goal..."></textarea>
+                            <small class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+                        </div>
+                    </div>
+
+                    <!-- GPA Target Details -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">GPA Target</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="gpaTarget" class="form-label required">Target GPA</label>
+                                <input type="number" class="form-control" th:field="*{target}" 
+                                       id="gpaTarget" min="0" max="4" step="0.1" 
+                                       placeholder="e.g., 3.5" required>
+                                <div class="form-text">Enter your target GPA (0.0 - 4.0)</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('target')}" th:errors="*{target}"></small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gpaActual" class="form-label">Current GPA (Optional)</label>
+                                <input type="number" class="form-control" th:field="*{actual}" 
+                                       id="gpaActual" min="0" max="4" step="0.1" 
+                                       placeholder="e.g., 3.2">
+                                <div class="form-text">Your current GPA if known</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('actual')}" th:errors="*{actual}"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gpaTypeSelect" class="form-label required">GPA Type</label>
+                            <select class="form-select" th:field="*{gpaType}" id="gpaTypeSelect" required>
+                                <option value="">Select GPA Type</option>
+                                <option value="semester">Semester GPA</option>
+                                <option value="cumulative">Cumulative GPA</option>
+                                <option value="major">Major GPA</option>
+                            </select>
+                            <div class="form-text">Select the type of GPA you're targeting</div>
+                            <small class="text-danger" th:if="${#fields.hasErrors('gpaType')}" th:errors="*{gpaType}"></small>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Timeline</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gpaStartDate" class="form-label required">Start Date</label>
+                                <input type="date" class="form-control" th:field="*{startDate}" 
+                                       id="gpaStartDate" required>
+                                <small class="text-danger" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gpaEndDate" class="form-label required">Target Completion Date</label>
+                                <input type="date" class="form-control" th:field="*{endDate}" 
+                                       id="gpaEndDate" required>
+                                <small class="text-danger" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a href="/goals/list" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <span th:text="${isEdit ? 'Update Goal' : 'Create Goal'}">Create Goal</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Grade Goal Form -->
+        <div id="gradeFormContainer">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0 text-info">
+                            <i class="bi bi-graph-up-arrow me-2"></i>
+                            Grade Goal Details
+                        </h3>
+                        <span class="back-to-selection" onclick="backToSelection()">
+                            <i class="bi bi-arrow-left me-1"></i>Change Goal Type
+                        </span>
+                    </div>
+                    <p class="mb-0 text-muted">Define your grade percentage target and timeline</p>
+                </div>
+
+                <form th:action="${isEdit ? '/goals/update' : '/goals/save'}" method="post" th:object="${goal}" id="gradeForm">
+                    <!-- Hidden Fields -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="goalType" value="grade" />
+                    
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="gradeName" class="form-label required">Goal Name</label>
+                                <input type="text" class="form-control" th:field="*{name}" 
+                                       id="gradeName" placeholder="e.g., Achieve 85% average" required>
+                                <div class="form-text">Give your goal a descriptive name</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="gradePriority" class="form-label required">Priority</label>
+                                <select class="form-select" th:field="*{priority}" id="gradePriority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                                <small class="text-danger" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gradeDescription" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" th:field="*{description}" 
+                                      id="gradeDescription" rows="3" 
+                                      placeholder="Describe your goal..."></textarea>
+                            <small class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+                        </div>
+                    </div>
+
+                    <!-- Grade Target Details -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Grade Target</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="gradeTarget" class="form-label required">Target Grade (%)</label>
+                                <input type="number" class="form-control" th:field="*{target}" 
+                                       id="gradeTarget" min="0" max="100" step="0.1" 
+                                       placeholder="e.g., 85" required>
+                                <div class="form-text">Enter your target grade percentage (0 - 100)</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('target')}" th:errors="*{target}"></small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gradeActual" class="form-label">Current Grade (%) (Optional)</label>
+                                <input type="number" class="form-control" th:field="*{actual}" 
+                                       id="gradeActual" min="0" max="100" step="0.1" 
+                                       placeholder="e.g., 75">
+                                <div class="form-text">Your current average grade if known</div>
+                                <small class="text-danger" th:if="${#fields.hasErrors('actual')}" th:errors="*{actual}"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="gradeTypeSelect" class="form-label required">Goal Scope</label>
+                            <select class="form-select" th:field="*{gpaType}" id="gradeTypeSelect" required>
+                                <option value="">Select Scope</option>
+                                <option value="all_courses">All Courses</option>
+                                <option value="current_semester">Current Semester Only</option>
+                                <option value="major_courses">Major Courses Only</option>
+                            </select>
+                            <div class="form-text">Select which courses this goal applies to</div>
+                            <small class="text-danger" th:if="${#fields.hasErrors('gpaType')}" th:errors="*{gpaType}"></small>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="mb-4">
+                        <h5 class="border-bottom pb-2 mb-3">Timeline</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gradeStartDate" class="form-label required">Start Date</label>
+                                <input type="date" class="form-control" th:field="*{startDate}" 
+                                       id="gradeStartDate" required>
+                                <small class="text-danger" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gradeEndDate" class="form-label required">Target Completion Date</label>
+                                <input type="date" class="form-control" th:field="*{endDate}" 
+                                       id="gradeEndDate" required>
+                                <small class="text-danger" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a href="/goals/list" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <span th:text="${isEdit ? 'Update Goal' : 'Create Goal'}">Create Goal</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const typeSelection = document.getElementById('typeSelection');
+        const gpaFormContainer = document.getElementById('gpaFormContainer');
+        const gradeFormContainer = document.getElementById('gradeFormContainer');
+        const gpaCard = document.getElementById('gpaCard');
+        const gradeCard = document.getElementById('gradeCard');
+        
+        // Mobile menu toggle
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 991 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Add scroll effect to header on desktop
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.innerWidth > 991) {
+                if (window.scrollY > 10) {
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                    header.style.padding = '15px 30px';
+                } else {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                    header.style.padding = '20px 30px';
+                }
+            } else {
+                if (window.scrollY > 10) {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                }
+            }
+        });
+        
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                if (window.innerWidth > 991 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            }, 250);
+        });
+        
+        // Function to select goal type
+        function selectGoalType(type) {
+            // Remove selected class from all cards
+            gpaCard.classList.remove('selected');
+            gradeCard.classList.remove('selected');
+            
+            // Hide type selection
+            typeSelection.style.display = 'none';
+            
+            // Hide all forms
+            gpaFormContainer.style.display = 'none';
+            gradeFormContainer.style.display = 'none';
+            
+            // Show selected form and highlight card
+            if (type === 'gpa') {
+                gpaCard.classList.add('selected');
+                gpaFormContainer.style.display = 'block';
+                setDefaultDates('gpa');
+            } else if (type === 'grade') {
+                gradeCard.classList.add('selected');
+                gradeFormContainer.style.display = 'block';
+                setDefaultDates('grade');
+            }
+            
+            // Scroll to form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Function to go back to type selection
+        function backToSelection() {
+            // Show type selection
+            typeSelection.style.display = 'block';
+            
+            // Hide all forms
+            gpaFormContainer.style.display = 'none';
+            gradeFormContainer.style.display = 'none';
+            
+            // Remove selected class from cards
+            gpaCard.classList.remove('selected');
+            gradeCard.classList.remove('selected');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Set default dates for new goals
+        function setDefaultDates(formType) {
+            const today = new Date();
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(today.getMonth() + 1);
+            
+            // Format date as YYYY-MM-DD
+            const formatDate = (date) => {
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            
+            // Set default dates for the active form
+            let startDateId, endDateId;
+            
+            if (formType === 'gpa') {
+                startDateId = 'gpaStartDate';
+                endDateId = 'gpaEndDate';
+            } else if (formType === 'grade') {
+                startDateId = 'gradeStartDate';
+                endDateId = 'gradeEndDate';
+            }
+            
+            const startInput = document.getElementById(startDateId);
+            const endInput = document.getElementById(endDateId);
+            
+            if (startInput && !startInput.value) {
+                startInput.value = formatDate(today);
+            }
+            if (endInput && !endInput.value) {
+                endInput.value = formatDate(nextMonth);
+            }
+        }
+        
+        // Form validation
+        document.getElementById('gpaForm')?.addEventListener('submit', function(e) {
+            const targetInput = document.getElementById('gpaTarget');
+            if (targetInput) {
+                const targetValue = parseFloat(targetInput.value);
+                if (targetValue < 0 || targetValue > 4 || isNaN(targetValue)) {
+                    e.preventDefault();
+                    alert('Please enter a valid GPA between 0.0 and 4.0');
+                    return false;
+                }
+            }
+            return true;
+        });
+        
+        document.getElementById('gradeForm')?.addEventListener('submit', function(e) {
+            const targetInput = document.getElementById('gradeTarget');
+            if (targetInput) {
+                const targetValue = parseFloat(targetInput.value);
+                if (targetValue < 0 || targetValue > 100 || isNaN(targetValue)) {
+                    e.preventDefault();
+                    alert('Please enter a valid grade percentage between 0 and 100');
+                    return false;
+                }
+            }
+            return true;
+        });
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get Thymeleaf context values
+            const isEdit = document.querySelector('h1').textContent.includes('Edit');
+            const gpaTypeSelect = document.getElementById('gpaTypeSelect');
+            const gradeTypeSelect = document.getElementById('gradeTypeSelect');
+            
+            console.log('Edit mode:', isEdit);
+            
+            // Event listeners for goal type cards
+            gpaCard.addEventListener('click', function() {
+                selectGoalType('gpa');
+            });
+            
+            gradeCard.addEventListener('click', function() {
+                selectGoalType('grade');
+            });
+            
+            // Auto-select goal type when editing
+            if (isEdit) {
+                // Check which form has data
+                const gpaTarget = document.getElementById('gpaTarget')?.value;
+                const gradeTarget = document.getElementById('gradeTarget')?.value;
+                const gpaTypeValue = gpaTypeSelect?.value;
+                const gradeTypeValue = gradeTypeSelect?.value;
+                
+                console.log('GPA Target:', gpaTarget);
+                console.log('Grade Target:', gradeTarget);
+                console.log('GPA Type:', gpaTypeValue);
+                console.log('Grade Type:', gradeTypeValue);
+                
+                // Hide type selection
+                typeSelection.style.display = 'none';
+                
+                // Determine which form to show based on data
+                if (gpaTypeValue && (gpaTypeValue === 'semester' || gpaTypeValue === 'cumulative' || gpaTypeValue === 'major')) {
+                    // Show GPA form
+                    console.log('Showing GPA form');
+                    gpaFormContainer.style.display = 'block';
+                    gradeFormContainer.style.display = 'none';
+                } else if (gradeTypeValue && (gradeTypeValue === 'all_courses' || gradeTypeValue === 'current_semester' || gradeTypeValue === 'major_courses')) {
+                    // Show Grade form
+                    console.log('Showing Grade form');
+                    gpaFormContainer.style.display = 'none';
+                    gradeFormContainer.style.display = 'block';
+                } else if (gpaTarget) {
+                    // Show GPA form based on target value
+                    console.log('Showing GPA form based on target');
+                    gpaFormContainer.style.display = 'block';
+                    gradeFormContainer.style.display = 'none';
+                } else if (gradeTarget) {
+                    // Show Grade form based on target value
+                    console.log('Showing Grade form based on target');
+                    gpaFormContainer.style.display = 'none';
+                    gradeFormContainer.style.display = 'block';
+                } else {
+                    // Default to showing type selection if we can't determine
+                    console.log('Could not determine goal type, showing selection');
+                    typeSelection.style.display = 'block';
+                }
+            } else {
+                // For new goals, show type selection
+                typeSelection.style.display = 'block';
+                gpaFormContainer.style.display = 'none';
+                gradeFormContainer.style.display = 'none';
+            }
+            
+            // Initialize header shadow
+            const header = document.getElementById('header');
+            if (window.scrollY > 10) {
+                header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>

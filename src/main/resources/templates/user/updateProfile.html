@@ -1,10 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/edit-profile.css}">
 </head>
 <body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
 
+        <div class="sidebar-menu">
+            <!-- Main Menu -->
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <!-- ADDED: My Goals Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/list}">
+                        <i class="bi bi-bullseye"></i> My Goals
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <!-- ADDED: Add Goal Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/new}">
+                        <i class="bi bi-plus-circle"></i> Add Goal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>Edit Profile</h1>
+        </div>
+        <div class="user-profile" onclick="location.href='/user/profile'">
+            <div class="user-details d-none d-md-block">
+                <h6 th:text="${user.name}">User Name</h6>
+                <small th:text="${user.studentNo}">Student No</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="profile-container">
+            
+            <!-- Edit Profile Form -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="bi bi-pencil-square"></i>
+                    <h4>Edit Profile Information</h4>
+                </div>
+                
+                <form th:action="@{/user/save}" th:object="${user}" method="post" id="editProfileForm">
+                    <!-- CSRF Token -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    
+                    <!-- Success/Error Messages -->
+                    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <span th:text="${successMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span th:text="${errorMessage}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <!-- Personal Information Section -->
+                    <div class="section-header">
+                        <h5><i class="bi bi-person me-2"></i>Personal Information</h5>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   th:field="*{name}"
+                                   required>
+                            <div class="form-text">Your full name as it appears in university records</div>
+                            <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback d-block">
+                                <span th:errors="*{name}"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   th:field="*{email}"
+                                   required>
+                            <div class="form-text">University email address</div>
+                            <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback d-block">
+                                <span th:errors="*{email}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="studentNo" class="form-label">Student Number *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="studentNo" 
+                                   th:field="*{studentNo}"
+                                   required
+                                   readonly>
+                            <div class="form-text">Student number cannot be changed</div>
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="selectedYear" class="form-label">Year Academic data *</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="selectedYear"
+                                   th:field="*{selectedYear}"
+                                   required
+                                   >
+                            <div class="form-text">select the year you want to view the data of (e.g 2025)</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Academic Information Section -->
+                    <div class="section-header">
+                        <h5><i class="bi bi-mortarboard me-2"></i>Academic Information</h5>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="degree" class="form-label">Degree Program *</label>
+                            <select class="form-select" 
+                                    id="degree" 
+                                    th:field="*{degree.name}"
+                                    required>
+                                <option value="">-- Select Degree Program --</option>
+                                <option th:each="degree : ${degrees}"
+                                        th:value="${degree.name}"
+                                        th:text="${degree.name} + ' (' + ${degree.code} + ')'"
+                                        th:selected="${user.degree != null && degree.code == user.degree.code}">
+                                    Computer Science (CS)
+                                </option>
+                            </select>
+                            <div class="form-text">Select your current degree program</div>
+                            <div th:if="${#fields.hasErrors('degree')}" class="invalid-feedback d-block">
+                                <span th:errors="*{degree}"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                        <a th:href="@{/user/profile}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Profile
+                        </a>
+                        
+                        <div>
+                            <button type="reset" class="btn btn-outline-danger me-2">
+                                <i class="bi bi-x-circle me-2"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2026 GradeGoal Academic Tracker. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script th:src="@{/js/edit-profile.js}"></script>
 </body>
 </html>

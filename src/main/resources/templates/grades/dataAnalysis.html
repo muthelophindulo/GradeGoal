@@ -34,11 +34,11 @@
             background: linear-gradient(135deg, #f5f7fb 0%, #e3e6f0 100%);
             color: #333;
             overflow-x: hidden;
-            padding-top: 80px;
             min-height: 100vh;
+            padding-top: 0; /* REMOVED padding-top */
         }
         
-        /* Sidebar */
+        /* Sidebar - FIXED: Always overlay on mobile */
         .sidebar {
             position: fixed;
             top: 0;
@@ -48,14 +48,23 @@
             background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
             color: white;
             padding: 20px 0;
-            z-index: 1000;
+            z-index: 1100;
             box-shadow: 5px 0 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
         }
         
         .sidebar-header {
             padding: 0 20px 20px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .sidebar-header h3 {
@@ -71,8 +80,19 @@
             color: #4cc9f0;
         }
         
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
         .sidebar-menu {
             padding: 10px 0;
+            overflow-y: auto;
+            height: calc(100vh - 100px);
         }
         
         .nav-item {
@@ -102,11 +122,11 @@
             width: 25px;
         }
         
-        /* Header */
+        /* Header - FIXED: Always at top */
         .header {
             position: fixed;
             top: 0;
-            left: var(--sidebar-width);
+            left: 0;
             right: 0;
             background: white;
             padding: 15px 30px;
@@ -114,8 +134,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 999;
+            z-index: 1099;
             border-bottom: 3px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        /* Desktop: Adjust header when sidebar is visible */
+        @media (min-width: 992px) {
+            .header {
+                left: var(--sidebar-width);
+            }
         }
         
         .header-left {
@@ -187,11 +215,47 @@
             font-size: 0.8rem;
         }
         
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1098;
+            display: none;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
         /* Main Content */
         .main-content {
-            margin-left: var(--sidebar-width);
+            margin-left: 0;
             padding: 30px;
             transition: all 0.3s ease;
+            padding-top: 80px; /* Space for fixed header */
+        }
+        
+        /* Desktop: Show sidebar by default */
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-width);
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .close-sidebar {
+                display: none;
+            }
         }
         
         /* Dashboard Header */
@@ -551,7 +615,7 @@
             
             .header {
                 left: 0;
-                padding: 10px 20px;
+                padding: 15px 20px;
             }
             
             .menu-toggle {
@@ -563,6 +627,7 @@
             .main-content {
                 margin-left: 0;
                 padding: 20px;
+                padding-top: 80px;
             }
             
             .dashboard-title {
@@ -571,6 +636,10 @@
             
             .courses-grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            
+            .close-sidebar {
+                display: block;
             }
         }
         
@@ -612,21 +681,43 @@
             .user-details {
                 display: none;
             }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .main-content {
+                padding: 15px;
+                padding-top: 75px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h3><i class="bi bi-graph-up-arrow"></i> GradeGoal</h3>
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
 
         <div class="sidebar-menu">
+            <!-- Main Menu -->
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/dashboard}">
                         <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <!-- ADDED: My Goals Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/list}">
+                        <i class="bi bi-bullseye"></i> My Goals
                     </a>
                 </li>
                 <li class="nav-item">
@@ -641,7 +732,18 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" th:href="@{/grades}">
-                        <i class="bi bi-bar-chart-line"></i> Grades Analysis
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
+                <!-- ADDED: Add Goal Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/new}">
+                        <i class="bi bi-plus-circle"></i> Add Goal
                     </a>
                 </li>
                 <li class="nav-item">
@@ -654,6 +756,11 @@
                         <i class="bi bi-clipboard-plus"></i> Add Assessment
                     </a>
                 </li>
+
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/user/profile}">
                         <i class="bi bi-person-circle"></i> Profile
@@ -1237,21 +1344,32 @@
     </script>
     
     <script>
-        // Mobile menu toggle
+        // Mobile menu toggle - FIXED VERSION
         const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         
-        menuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
-        });
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
         
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 992 && 
-                !sidebar.contains(event.target) && 
-                !menuToggle.contains(event.target) && 
-                sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
+        function closeSidebarMenu() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Enable scrolling
+        }
+        
+        menuToggle.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarMenu);
+        sidebarOverlay.addEventListener('click', closeSidebarMenu);
+        
+        // Close sidebar with escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebarMenu();
             }
         });
         
@@ -1298,6 +1416,16 @@
                 this.style.transform = 'translateY(0)';
                 this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.08)';
             });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 992) {
+                // On desktop, make sure sidebar is visible
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         });
     </script>
 </body>

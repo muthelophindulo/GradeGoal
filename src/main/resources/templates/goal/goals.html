@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.name} + ' - My Goals - GradeGoal'">My Goals - GradeGoal</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --success-color: #4cc9f0;
+    --warning-color: #f72585;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --sidebar-width: 260px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f5f7fb;
+    color: #333;
+    overflow-x: hidden;
+    padding-top: 90px; /* Space for fixed header */
+}
+
+/* Fixed Header - ALWAYS STICKY */
+.header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    background: white;
+    border-radius: 0 0 15px 15px;
+    padding: 20px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: none;
+}
+
+.header h1 {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    padding: 8px 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+    background: #f8f9fa;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.user-details {
+    text-align: right;
+}
+
+.user-details h6 {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-details small {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.degree-badge {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+    padding: 0 20px 30px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.sidebar-header h3 i {
+    color: #4cc9f0;
+}
+
+.close-sidebar {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.nav-item {
+    margin-bottom: 5px;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 25px;
+    border-radius: 0 30px 30px 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #4cc9f0;
+}
+
+.nav-link i {
+    font-size: 1.2rem;
+    width: 25px;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 30px 20px 20px;
+    transition: all 0.3s ease;
+    min-height: calc(100vh - 90px);
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.page-header h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.page-header p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* Goals Filter and Search */
+.goals-controls {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.1);
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Goals Grid */
+.goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 30px;
+    align-items: stretch;
+}
+
+/* Goal Card - REVISED */
+.goal-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 420px;
+    overflow: visible;
+}
+
+.goal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Days Remaining - Positioned better */
+.days-remaining {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 15px;
+    border-radius: 0 15px 0 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 2;
+}
+
+.days-low {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+.days-medium {
+    background: rgba(255, 209, 102, 0.1);
+    color: #ffa726;
+}
+
+.days-high {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success-color);
+}
+
+/* Goal Type Badge */
+.goal-type-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+    width: fit-content;
+}
+
+.type-gpa {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.type-grade {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--warning-color);
+}
+
+.goal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    position: relative;
+    padding-right: 40px; /* Space for action buttons */
+}
+
+.goal-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+    flex: 1;
+    margin-right: 15px;
+    word-break: break-word;
+}
+
+.goal-priority {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.priority-low {
+    background: rgba(76, 201, 240, 0.1);
+    color: var(--success-color);
+}
+
+.priority-medium {
+    background: rgba(255, 209, 102, 0.1);
+    color: #ffa726;
+}
+
+.priority-high {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--warning-color);
+}
+
+.priority-critical {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+.goal-description {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex: 1;
+    min-height: 60px;
+    overflow: visible;
+    word-break: break-word;
+}
+
+/* Action Buttons - Better Positioning */
+.goal-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+}
+
+.goal-card:hover .goal-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #ddd;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Progress Section */
+.goal-progress-section {
+    margin-bottom: 20px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.progress-percentage {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.progress-bar-container {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.progress-on-track {
+    background: linear-gradient(90deg, #4ecdc4, #44a08d);
+}
+
+.progress-at-risk {
+    background: linear-gradient(90deg, #ffd166, #f9c74f);
+}
+
+.progress-behind {
+    background: linear-gradient(90deg, #ff6b6b, #ee5a52);
+}
+
+/* Goal Metrics - Better layout */
+.goal-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.metric-item {
+    text-align: center;
+}
+
+.metric-value {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    margin-bottom: 3px;
+    word-break: break-word;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Timeline - Pushed to bottom */
+.goal-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #eaeaea;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.timeline-item {
+    text-align: center;
+    flex: 1;
+}
+
+.timeline-date {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dark-color);
+    margin-bottom: 3px;
+}
+
+.timeline-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #adb5bd;
+    margin-bottom: 20px;
+}
+
+/* Responsive Styles - REVISED */
+@media (max-width: 1199.98px) {
+    .goals-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .header {
+        left: 0;
+        right: 0;
+        border-radius: 0;
+        padding: 15px 20px;
+        position: fixed;
+        top: 0;
+        z-index: 999;
+    }
+
+    body {
+        padding-top: 75px;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px 15px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .close-sidebar {
+        display: block;
+    }
+
+    .goals-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .search-box {
+        min-width: 100%;
+    }
+
+    .goal-card {
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .header {
+        padding: 12px 15px;
+    }
+
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .main-content {
+        padding: 15px 10px;
+    }
+
+    .goals-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .goal-card {
+        padding: 20px;
+        min-height: auto;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-buttons {
+        justify-content: center;
+    }
+
+    .goal-description {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .goal-card-header {
+        flex-direction: column;
+        gap: 10px;
+        padding-right: 0;
+    }
+
+    .goal-actions {
+        position: relative;
+        top: 0;
+        right: 0;
+        opacity: 1;
+        margin-top: 10px;
+        justify-content: flex-end;
+    }
+
+    .goal-title {
+        margin-right: 0;
+    }
+
+    .goal-metrics {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .goal-timeline {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .timeline-item {
+        text-align: left;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 400px) {
+    .goals-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .goal-metrics {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/goals/list}">
+                        <i class="bi bi-bullseye"></i> My Goals
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/list}">
+                        <i class="bi bi-journal-bookmark"></i> My Courses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/list}">
+                        <i class="bi bi-clipboard-data"></i> Assessments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/grades}">
+                        <i class="bi bi-bar-chart-line"></i> Grades
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/new}">
+                        <i class="bi bi-plus-circle"></i> Add Goal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/course/new}">
+                        <i class="bi bi-plus-circle"></i> Add Course
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/assessment/new}">
+                        <i class="bi bi-clipboard-plus"></i> Add Assessment
+                    </a>
+                </li>
+                
+                <li class="nav-item mt-4">
+                    <hr class="text-white opacity-25 mx-3">
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/profile}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header" id="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1>My Goals</h1>
+        </div>
+        <div class="user-profile" onclick="location.href='/user/profile'">
+            <div class="user-details d-none d-md-block">
+                <h6 th:text="${user.name}">John Doe</h6>
+                <small th:text="${user.studentNo}">S001</small>
+                <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
+            </div>
+            <div class="user-avatar">
+                <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h2>Academic Goals</h2>
+                <p th:text="'Total ' + ${goals != null ? goals.size() : '0'} + ' goals'">Total 0 goals</p>
+            </div>
+            <a th:href="@{/goals/new}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add New Goal
+            </a>
+        </div>
+
+        <!-- Goals Filter and Search -->
+        <div class="goals-controls">
+            <div class="filter-row">
+                <div class="search-box">
+                    <input type="text" id="searchGoals" placeholder="Search goals by name or description...">
+                    <div class="search-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All Goals</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                    <button class="filter-btn" data-filter="priority-high">High Priority</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals Grid -->
+        <div class="goals-grid" id="goalsContainer">
+            <div th:if="${goals != null && !goals.isEmpty()}" th:each="goal : ${goals}">
+                <!-- Goal Card -->
+                <div class="goal-card">
+
+                    <!-- Days Remaining Badge -->
+                    <div th:class="${goal.isOverdue ? 'days-remaining days-low' :
+               (goal.daysRemaining <= 7 ? 'days-remaining days-low' :
+               (goal.daysRemaining <= 14 ? 'days-remaining days-medium' : 'days-remaining days-high'))}">
+                        <span th:if="${goal.isOverdue}">Overdue</span>
+                        <span th:unless="${goal.isOverdue}"
+                              th:text="${goal.daysRemaining} + ' days left'">
+        30 days left
+    </span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="goal-actions">
+                        <a class="action-btn" th:href="@{/goals/edit/{id}(id=${goal.id})}" onclick="return confirm('edit this Goal?')" title="Edit Goal">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a class="action-btn" th:href="@{/goals/delete/{id}(id=${goal.id})}" onclick="return confirm('Delete this Goal?')" title="Delete Goal">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Goal Type Badge -->
+                    <div th:class="'goal-type-badge type-' + ${goal.gpaType == 'semester' ? 'gpa' : 'grade'}">
+                        <span th:text="${goal.gpaType == 'semester' ? 'GPA Goal' : 
+                                      (goal.gpaType == 'cumulative' ? 'Cumulative GPA' : 
+                                      (goal.gpaType == 'major' ? 'Major GPA' : 'Grade Goal'))}">
+                            GPA Goal
+                        </span>
+                    </div>
+                    
+                    <!-- Goal Header -->
+                    <div class="goal-card-header">
+                        <h3 class="goal-title" th:text="${goal.name}">Achieve 3.5 Semester GPA</h3>
+                        <div th:class="'goal-priority priority-' + ${goal.priority}">
+                            <span th:text="${#strings.capitalize(goal.priority)}">Medium</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Goal Description -->
+                    <p class="goal-description" th:text="${goal.description}">
+                        Maintain a strong GPA throughout the semester to qualify for honors program.
+                    </p>
+                    
+                    <!-- Progress Section -->
+                    <div class="goal-progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Progress</span>
+                            <span class="progress-percentage">
+            <!-- Use the pre-calculated progress field -->
+            <span th:text="${#numbers.formatDecimal(goal.progress, 0, 0)}">0</span>%
+        </span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <!-- Make sure goal.progress is a double/float, not an object -->
+                            <div th:with="percent=${goal.progress != null ? goal.progress : 0}"
+                                 th:class="'progress-bar ' +
+                     (${percent} >= 75 ? 'progress-on-track' :
+                      (${percent} >= 50 ? 'progress-at-risk' : 'progress-behind'))"
+                                 th:style="'width: ' + ${percent} + '%;'">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Goal Metrics -->
+                    <div class="goal-metrics">
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <span th:text="${goal.target}">3.5</span>
+                                <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                            </div>
+                            <div class="metric-label">Target</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <span th:text="${goal.actual}">3.2</span>
+                                <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                            </div>
+                            <div class="metric-label">Current</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <!-- Show + sign if remaining is positive -->
+                                <span th:if="${goal.target - goal.actual > 0}">+</span>
+                                <!-- Show the actual value -->
+                                <span th:text="${#numbers.formatDecimal(goal.target - goal.actual, 1, 2)}">0.3</span>
+                                <!-- Show % if not a GPA type -->
+                                <span th:if="${goal.gpaType != 'semester' and goal.gpaType != 'cumulative' and goal.gpaType != 'major'}">%</span>
+                            </div>
+                            <div class="metric-label">Remaining</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" th:text="${goal.daysRemaining}">
+                                90
+                            </div>
+                            <div class="metric-label">Total Days</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="goal-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date" th:text="${#temporals.format(goal.startDate, 'MMM dd')}">
+                                Jan 15
+                            </div>
+                            <div class="timeline-label">Start Date</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date" th:text="${#temporals.format(goal.endDate, 'MMM dd')}">
+                                Jan 15
+                            </div>
+                            <div class="timeline-label">End Date</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:if="${goals == null || goals.isEmpty()}" class="empty-state">
+                <i class="bi bi-bullseye"></i>
+                <h4>No Goals Found</h4>
+                <p>You haven't created any academic goals yet. Start by setting your first goal!</p>
+                <a th:href="@{/goals/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Goal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 991 && 
+                !sidebar.contains(event.target) && 
+                !menuToggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.innerWidth > 991) {
+                if (window.scrollY > 10) {
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                    header.style.padding = '15px 30px';
+                } else {
+                    header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+                    header.style.padding = '20px 30px';
+                }
+            }
+        });
+        
+        // Goals Filter Functionality
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                filterGoals(filter);
+            });
+        });
+        
+        // Search Functionality
+        document.getElementById('searchGoals').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterBySearch(searchTerm);
+        });
+        
+        function filterGoals(filter) {
+            const goalCards = document.querySelectorAll('.goal-card');
+            
+            goalCards.forEach(card => {
+                const priority = card.querySelector('.goal-priority').textContent.toLowerCase();
+                const isCompleted = card.querySelector('.days-remaining').textContent.includes('Overdue');
+                
+                switch(filter) {
+                    case 'all':
+                        card.style.display = 'block';
+                        break;
+                    case 'active':
+                        card.style.display = !isCompleted ? 'block' : 'none';
+                        break;
+                    case 'completed':
+                        card.style.display = isCompleted ? 'block' : 'none';
+                        break;
+                    case 'priority-high':
+                        card.style.display = priority.includes('high') || priority.includes('critical') ? 'block' : 'none';
+                        break;
+                }
+                
+                // Add animation
+                if (card.style.display === 'block') {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.3s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 10);
+                }
+            });
+        }
+        
+        function filterBySearch(searchTerm) {
+            const goalCards = document.querySelectorAll('.goal-card');
+            
+            goalCards.forEach(card => {
+                const title = card.querySelector('.goal-title').textContent.toLowerCase();
+                const description = card.querySelector('.goal-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    // Highlight search term
+                    if (searchTerm) {
+                        highlightText(card.querySelector('.goal-title'), searchTerm);
+                        highlightText(card.querySelector('.goal-description'), searchTerm);
+                    } else {
+                        removeHighlight(card);
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        function highlightText(element, searchTerm) {
+            const text = element.textContent;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            const highlighted = text.replace(regex, '<mark>$1</mark>');
+            element.innerHTML = highlighted;
+        }
+        
+        function removeHighlight(card) {
+            const title = card.querySelector('.goal-title');
+            const description = card.querySelector('.goal-description');
+            
+            if (title) {
+                title.innerHTML = title.textContent;
+            }
+            if (description) {
+                description.innerHTML = description.textContent;
+            }
+        }
+        
+        // Goal Actions Functions
+        function editGoal(goalId) {
+            window.location.href = `/goals/edit/${goalId}`;
+        }
+        
+        function deleteGoal(goalId) {
+            if (confirm('Are you sure you want to delete this goal? This action cannot be undone.')) {
+                // Send delete request
+                fetch(`/goals/delete/${goalId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Remove goal card from UI
+                        const goalCard = document.querySelector(`[data-goal-id="${goalId}"]`);
+                        if (goalCard) {
+                            goalCard.style.opacity = '0';
+                            goalCard.style.transform = 'scale(0.9)';
+                            setTimeout(() => {
+                                goalCard.remove();
+                                checkEmptyState();
+                            }, 300);
+                        }
+                        showToast('Goal deleted successfully!', 'success');
+                    } else {
+                        showToast('Failed to delete goal. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred. Please try again.', 'error');
+                });
+            }
+        }
+        
+        function showToast(message, type) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Add styles
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4ecdc4' : '#ff6b6b'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+        
+        function checkEmptyState() {
+            const visibleGoals = document.querySelectorAll('.goal-card[style*="block"]').length;
+            const emptyState = document.querySelector('.empty-state');
+            
+            if (visibleGoals === 0 && emptyState) {
+                emptyState.style.display = 'block';
+            } else if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+        }
+        
+        // Add data-goal-id attribute to each goal card for easier reference
+        document.addEventListener('DOMContentLoaded', function() {
+            const goalCards = document.querySelectorAll('.goal-card');
+            goalCards.forEach((card, index) => {
+                card.setAttribute('data-goal-id', index + 1);
+            });
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                
+                @keyframes slideOut {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+                
+                .toast-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                
+                .toast-content i {
+                    font-size: 1.2rem;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

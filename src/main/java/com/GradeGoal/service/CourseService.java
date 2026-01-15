@@ -17,15 +17,15 @@ public class CourseService {
     @Autowired
     private AssessmentService assessmentService;
 
+    @Autowired
+    private UserService userService;
+
     public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
 
     public List<Course> getCourses(String studentNo){
-        return courseRepository.findAll()
-                .stream()
-                .filter(course -> course.getUser().getStudentNo().equals(studentNo))
-                .toList();
+        return getYearlyAssessments(studentNo);
     }
 
     public Course saveCourse(Course course){
@@ -41,9 +41,7 @@ public class CourseService {
     }
 
     public int completed(String studNo){
-        List<Course> courses = courseRepository.findAll().stream()
-                .filter(course -> course.getUser().getStudentNo().equals(studNo))
-                .toList();
+        List<Course> courses = getYearlyAssessments(studNo);
         int completed = 0;
 
         if(courses.isEmpty()){
@@ -55,32 +53,27 @@ public class CourseService {
     }
 
     public double targetArchieved(String studNo){
-        List<Course> courses = courseRepository.findAll()
-                .stream()
-                .filter(course -> course.getUser().getStudentNo().equals(studNo))
-                .toList();
+        List<Course> courses = getYearlyAssessments(studNo);
         int target = 0;
 
         if (courses.isEmpty())
             return 0;
 
-        /*for(Course x : courses){
+        for(Course x : courses){
             if(x.getActualMark() >= x.getTargetMark()){
                 target++;
             }
-        }*/
+        }
 
-        target = courses.stream().filter(course -> course.getActualMark() >= course.getTargetMark()).toList().size();
+        //target = courses.stream().filter(course -> course.getActualMark() >= course.getTargetMark()).toList().size();
 
 
-        return Math.round(target / courses.size() * 100);
+        return Math.round((double) target / courses.size() * 100.0);
     }
 
     public List<Course> topCourses(String studNo){
         List<Course> top3 = new ArrayList<>();
-        List<Course> courses = courseRepository.findAll().stream()
-                .filter(course -> course.getUser().getStudentNo().equals(studNo))
-                .toList()
+        List<Course> courses = getYearlyAssessments(studNo)
                 .stream()
                 .sorted(Comparator.comparing(Course::getActualMark).reversed())
                 .collect(Collectors.toList());
@@ -100,9 +93,7 @@ public class CourseService {
     public Map<String, Double> examMark(String studNo){
         Map<String, Double> weigh = new HashMap<>();
 
-        List<Course> courses = courseRepository.findAll().stream()
-                .filter(course -> course.getUser().getStudentNo().equals(studNo))
-                .toList(); //courses belonging to a specefic user
+        List<Course> courses = getYearlyAssessments(studNo); //courses belonging to a specefic user
 
         List<Assessment> assessments = assessmentService.getAssessments(studNo);
 
@@ -126,5 +117,51 @@ public class CourseService {
         }
 
         return weigh;
+    }
+
+    /* used to load corses of the specefic year the user selected */
+    public List<Course> getYearlyAssessments(String user){
+        return userService.getUser(user).getCourses()
+                .stream()
+                .filter(course -> course
+                        .getYear() == userService.getUser(user).getSelectedYear())
+                .toList();
+    }
+
+    public double GPA(String studNo){
+        List<Course> courses = getYearlyAssessments(studNo);
+        double gpa =0;
+
+        for(Course x : courses){
+            if(x.getActualMark() >= 70.0){
+                gpa += 7;
+            } else if (x.getActualMark() >= 60 && x.getActualMark() <= 69) {
+                gpa+= 6;
+            } else if (x.getActualMark() >= 50 && x.getActualMark() <= 59) {
+                gpa+=5;
+            }
+            else {
+                gpa+=0;
+            }
+        }
+
+        return Math.round(gpa / courses.size());
+    }
+
+
+    public double AverageGrade(String studNo){
+        List<Course> courses = getYearlyAssessments(studNo);
+        double average = 0;
+
+        if(courses.isEmpty()){
+            return average;
+        }
+
+        for(Course x : courses){
+            average += x.getActualMark();
+        }
+
+        return Math.round(average / courses.size());
+
     }
 }

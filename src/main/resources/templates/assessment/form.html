@@ -352,6 +352,12 @@
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
             </li>
+            <!-- ADDED: My Goals Menu Item -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/list}">
+                    <i class="bi bi-bullseye"></i> My Goals
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/course/list}">
                     <i class="bi bi-journal-bookmark"></i> My Courses
@@ -372,13 +378,19 @@
                 <hr class="text-white opacity-25 mx-3">
             </li>
 
+            <!-- ADDED: Add Goal Menu Item -->
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/new}">
+                    <i class="bi bi-plus-circle"></i> Add Goal
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/course/new}">
                     <i class="bi bi-plus-circle"></i> Add Course
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/assessment/new}">
+                <a class="nav-link active" th:href="@{/assessment/new}">
                     <i class="bi bi-clipboard-plus"></i> Add Assessment
                 </a>
             </li>

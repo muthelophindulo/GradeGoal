@@ -2,10 +2,7 @@ package com.GradeGoal.controller;
 
 import com.GradeGoal.model.Assessment;
 import com.GradeGoal.model.Course;
-import com.GradeGoal.service.AssessmentService;
-import com.GradeGoal.service.CourseService;
-import com.GradeGoal.service.DegreeService;
-import com.GradeGoal.service.UserService;
+import com.GradeGoal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +20,8 @@ public class WebController {
     private CourseService courseService;
     @Autowired
     private AssessmentService assessmentService;
+    @Autowired
+    private GoalService goalService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model,Principal principal){
@@ -37,6 +36,9 @@ public class WebController {
 
             model.addAttribute("user", userService.getUser(loggedInUser));
             model.addAttribute("courses",courseService.topCourses(loggedInUser));
+            model.addAttribute("assessments",assessmentService.topAssessments(loggedInUser));
+            model.addAttribute("goals",goalService.getGoals());
+
 
             //check if the user has assessments and courses
             List<Course> courses = courseService.getCourses(loggedInUser);
@@ -48,9 +50,9 @@ public class WebController {
             model.addAttribute("pendingCount", assessmentService.pending(loggedInUser));
 
             //model.addAttribute("averageGrade",userService.AverageGrade(loggedInUser));
-            model.addAttribute("averageGrade", userService.AverageGrade(loggedInUser));
+            model.addAttribute("averageGrade", courseService.AverageGrade(loggedInUser));
 
-            model.addAttribute("gpa", userService.GPA(loggedInUser));
+            model.addAttribute("gpa", courseService.GPA(loggedInUser));
 
             return "dashboard";
         }

@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.DialectOverride;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -33,6 +35,9 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false)
+    private int selectedYear;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Course> courses;
@@ -45,4 +50,13 @@ public class User {
     @JoinColumn(name = "degree_name", referencedColumnName = "name",nullable = true)
     @ToString.Exclude
     private Degree degree;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Goal> goals;
+
+    @PrePersist
+    private void onCreate(){
+        this.selectedYear = LocalDate.now().getYear();
+    }
 }

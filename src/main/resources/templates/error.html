@@ -410,12 +410,19 @@
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
-        
+
         <div class="sidebar-menu">
+            <!-- Main Menu -->
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/dashboard}">
                         <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <!-- ADDED: My Goals Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/list}">
+                        <i class="bi bi-bullseye"></i> My Goals
                     </a>
                 </li>
                 <li class="nav-item">
@@ -433,11 +440,17 @@
                         <i class="bi bi-bar-chart-line"></i> Grades
                     </a>
                 </li>
-                
+
                 <li class="nav-item mt-4">
                     <hr class="text-white opacity-25 mx-3">
                 </li>
-                
+
+                <!-- ADDED: Add Goal Menu Item -->
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goals/new}">
+                        <i class="bi bi-plus-circle"></i> Add Goal
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/course/new}">
                         <i class="bi bi-plus-circle"></i> Add Course
@@ -448,11 +461,11 @@
                         <i class="bi bi-clipboard-plus"></i> Add Assessment
                     </a>
                 </li>
-                
+
                 <li class="nav-item mt-4">
                     <hr class="text-white opacity-25 mx-3">
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/user/profile}">
                         <i class="bi bi-person-circle"></i> Profile
