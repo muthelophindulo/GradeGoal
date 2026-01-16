@@ -30,7 +30,7 @@ public class WebController {
         String loggedInUser = principal.getName();
 
 
-        if(userService.getUser(loggedInUser).getCourses().isEmpty()){
+        if(userService.getUser(loggedInUser).getCourses().isEmpty() ){
             return "redirect:/course/new";
         }else {
 
