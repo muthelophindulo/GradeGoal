@@ -55,6 +55,10 @@ public class User {
     @ToString.Exclude
     private List<Goal> goals;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<ResetPasswordToken> tokens;
+
     @PrePersist
     private void onCreate(){
         this.selectedYear = LocalDate.now().getYear();

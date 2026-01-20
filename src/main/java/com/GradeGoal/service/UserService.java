@@ -19,6 +19,10 @@ public class UserService {
         return userRepository.getReferenceById(id);
     }
 
+    public User getByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
     @Transactional
     public User saveUser(User user){
         return userRepository.save(user);

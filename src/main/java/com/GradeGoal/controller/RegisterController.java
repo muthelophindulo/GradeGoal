@@ -3,6 +3,7 @@ package com.GradeGoal.controller;
 import com.GradeGoal.model.Degree;
 import com.GradeGoal.model.User;
 import com.GradeGoal.service.DegreeService;
+import com.GradeGoal.service.ResendService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,8 @@ public class RegisterController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ResendService resendService;
 
     @GetMapping("/register")
     public String register(Model model){
@@ -64,6 +67,7 @@ public class RegisterController {
 
             redirectAttributes.addFlashAttribute("successMessage",
                     "Registration successful! You can now login.");
+            resendService.sendWelcomeEmail(user.getEmail());
             return "redirect:/login";
 
         } catch (Exception e) {

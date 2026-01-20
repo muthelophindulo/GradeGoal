@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateSubmitButtonState() {
         if (!submitButton) return;
         
-        const currentPass = currentPassword ? currentPassword.value.trim() : '';
+        //const currentPass = currentPassword ? currentPassword.value.trim() : '';
         const newPass = newPassword ? newPassword.value.trim() : '';
         const confirmPass = confirmPassword ? confirmPassword.value.trim() : '';
         
@@ -108,8 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const passwordsMatch = checkPasswordMatch();
         
         // Enable button only if all conditions are met
-        const allValid = currentPass && 
-                        newPass && 
+        const allValid =newPass &&
                         confirmPass && 
                         strength.allMet && 
                         passwordsMatch;
