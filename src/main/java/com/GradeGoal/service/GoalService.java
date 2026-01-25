@@ -26,7 +26,7 @@ public class GoalService {
             goal.setIsOverdue(LocalDate.now().isAfter(goal.getEndDate()));
             goal.setProgress(goal.getActual() > 0 ? goal.getActual() / goal.getTarget() * 100.0 : 0.0);
         });
-        return goalRepository.findAll();
+        return goals;
     }
 
     public Goal getGoal(Long id){
