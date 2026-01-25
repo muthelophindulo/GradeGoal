@@ -44,7 +44,7 @@ public class GoalController {
         String username = principal.getName();
 
         model.addAttribute("user",userService.getUser(username));
-        model.addAttribute("goals",goalService.getGoals()); //Todo add list of goals
+        model.addAttribute("goals",goalService.getGoals(username));
 
         return "goal/goals";
     }

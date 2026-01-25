@@ -906,11 +906,11 @@ body {
                 <div class="goal-card">
 
                     <!-- Days Remaining Badge -->
-                    <div th:class="${goal.isOverdue ? 'days-remaining days-low' :
-               (goal.daysRemaining <= 7 ? 'days-remaining days-low' :
-               (goal.daysRemaining <= 14 ? 'days-remaining days-medium' : 'days-remaining days-high'))}">
-                        <span th:if="${goal.isOverdue}">Overdue</span>
-                        <span th:unless="${goal.isOverdue}"
+                    <div th:class="${(goal.isOverdue != null and goal.isOverdue) ? 'days-remaining days-low' :
+               (goal.daysRemaining != null and goal.daysRemaining <= 7 ? 'days-remaining days-low' :
+               (goal.daysRemaining != null and goal.daysRemaining <= 14 ? 'days-remaining days-medium' : 'days-remaining days-high'))}">
+                        <span th:if="${goal.isOverdue != null and goal.isOverdue}">Overdue</span>
+                        <span th:unless="${goal.isOverdue != null and goal.isOverdue}"
                               th:text="${goal.daysRemaining} + ' days left'">
         30 days left
     </span>
