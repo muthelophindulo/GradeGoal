@@ -48,7 +48,7 @@ public class WebController {
             model.addAttribute("user", userService.getUser(loggedInUser));
             model.addAttribute("courses",courseService.topCourses(loggedInUser));
             model.addAttribute("assessments",assessmentService.topAssessments(loggedInUser));
-            model.addAttribute("goals",goalService.getGoals());
+            model.addAttribute("goals",goalService.getGoals(loggedInUser));
 
 
             //check if the user has assessments and courses

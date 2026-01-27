@@ -16,17 +16,21 @@ public class GoalService {
     @Autowired
     private UserService userService;
 
-    public List<Goal> getGoals(){
-        List<Goal> goals = goalRepository.findAll().stream()
-                .filter(goal -> goal.getEndDate().getYear() == goal.getUser().getSelectedYear())
+    public List<Goal> getGoals(String studNo){
+
+        List<Goal> userGoals = userService.getUser(studNo)
+                .getGoals()
+                .stream()
+                .filter(goal -> goal.getUser().getStudentNo().equals(studNo) && goal.getStartDate().getYear() == goal.getUser().getSelectedYear())
                 .toList();
-        goals.forEach(goal -> {
+
+        userGoals.forEach(goal -> {
             Long daysRemaining = ChronoUnit.DAYS.between(goal.getStartDate(),goal.getEndDate());
             goal.setDaysRemaining(daysRemaining);
             goal.setIsOverdue(LocalDate.now().isAfter(goal.getEndDate()));
             goal.setProgress(goal.getActual() > 0 ? goal.getActual() / goal.getTarget() * 100.0 : 0.0);
         });
-        return goals;
+        return userGoals;
     }
 
     public Goal getGoal(Long id){

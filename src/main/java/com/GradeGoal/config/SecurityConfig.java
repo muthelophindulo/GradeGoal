@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/forgot-password","/reset/**","/reset/reset","/reset-password","/login", "/register","/save", "/register/**", "/errors", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/forgot-password","/reset/**","/reset/reset","/reset-password","/login", "/register","/save", "/register/**", "/errors", "/css/**", "/js/**", "/images/**","/swagger-ui/**").permitAll()
                         .requestMatchers("/dashboard").authenticated()
                         .requestMatchers("/assessment/**","/assessment").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
