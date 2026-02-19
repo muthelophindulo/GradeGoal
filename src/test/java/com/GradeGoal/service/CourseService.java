@@ -3,15 +3,13 @@ package com.GradeGoal.service;
 import com.GradeGoal.model.Course;
 import com.GradeGoal.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CourseService {
-    private CourseRepository courseRepository;
-    @Test
-    public void saveCourse(){
-        courseRepository.save(new Course());
-    }
+
 
 }

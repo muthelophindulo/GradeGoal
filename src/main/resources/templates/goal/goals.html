@@ -791,6 +791,11 @@ body {
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" th:href="@{/timetable/view}">
+                        <i class="bi bi-calendar-week"></i> Timetable
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link active" th:href="@{/goals/list}">
                         <i class="bi bi-bullseye"></i> My Goals
                     </a>
@@ -810,11 +815,16 @@ body {
                         <i class="bi bi-bar-chart-line"></i> Grades
                     </a>
                 </li>
-                
+
                 <li class="nav-item mt-4">
                     <hr class="text-white opacity-25 mx-3">
                 </li>
-                
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/timetable/add}">
+                        <i class="bi bi-plus-circle"></i> Add class
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/goals/new}">
                         <i class="bi bi-plus-circle"></i> Add Goal
@@ -830,11 +840,11 @@ body {
                         <i class="bi bi-clipboard-plus"></i> Add Assessment
                     </a>
                 </li>
-                
+
                 <li class="nav-item mt-4">
                     <hr class="text-white opacity-25 mx-3">
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/user/profile}">
                         <i class="bi bi-person-circle"></i> Profile

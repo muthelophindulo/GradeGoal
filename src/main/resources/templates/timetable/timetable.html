@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - GradeGoal</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            overflow-x: hidden;
+            padding-top: 90px; /* Space for fixed header */
+        }
+
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: none;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-details h6 {
+            margin-bottom: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .degree-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-header h3 i {
+            color: #4cc9f0;
+        }
+
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 25px;
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4cc9f0;
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 20px 20px;
+            transition: all 0.3s ease;
+            min-height: calc(100vh - 90px);
+        }
+
+        /* Timetable Card */
+        .timetable-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .timetable-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timetable-header h4 {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Table Styles */
+        .timetable-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .timetable-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 12px 5px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timetable-table td {
+            border: 1px solid #e9ecef;
+            padding: 0;
+            vertical-align: top;
+        }
+
+        .day-col {
+            background-color: #f1f3f5;
+            font-weight: 600;
+            width: 130px;
+            text-align: center;
+            vertical-align: middle !important;
+            color: #495057;
+        }
+
+        .slot-cell {
+            height: 95px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .slot-cell:hover {
+            background-color: #f8f9fa;
+        }
+
+        .class-box {
+            border-radius: 8px;
+            padding: 6px;
+            color: white;
+            font-size: 0.8rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .class-box:hover {
+            transform: scale(1.02);
+        }
+
+        .class-box strong {
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .class-box small {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .free-slot {
+            font-size: 0.75rem;
+            color: #adb5bd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .header {
+                left: 0;
+                border-radius: 0;
+                padding: 15px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .user-profile .user-details {
+                display: none;
+            }
+
+            body {
+                padding-top: 75px;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 15px;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .close-sidebar {
+                display: block;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .timetable-card {
+                padding: 15px;
+            }
+
+            .timetable-header h4 {
+                font-size: 1.2rem;
+            }
+
+            .btn-primary {
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
+
+            .day-col {
+                width: 80px;
+                font-size: 0.85rem;
+            }
+
+            .class-box strong {
+                font-size: 0.75rem;
+            }
+
+            .class-box small {
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .timetable-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: start;
+            }
+
+            .day-col {
+                width: 60px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar (same as dashboard) -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-graph-up"></i> GradeGoal</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="sidebar-menu">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/timetable/view}">
+                    <i class="bi bi-calendar-week"></i> Timetable
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/list}">
+                    <i class="bi bi-bullseye"></i> My Goals
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/list}">
+                    <i class="bi bi-journal-bookmark"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/list}">
+                    <i class="bi bi-clipboard-data"></i> Assessments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/grades}">
+                    <i class="bi bi-bar-chart-line"></i> Grades
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/timetable/add}">
+                    <i class="bi bi-plus-circle"></i> Add class
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/goals/new}">
+                    <i class="bi bi-plus-circle"></i> Add Goal
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/course/new}">
+                    <i class="bi bi-plus-circle"></i> Add Course
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/assessment/new}">
+                    <i class="bi bi-clipboard-plus"></i> Add Assessment
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <hr class="text-white opacity-25 mx-3">
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/profile}">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Fixed Header -->
+<div class="header" id="header">
+    <div class="header-left">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h1>GradeGoal</h1>
+    </div>
+    <div class="user-profile" onclick="location.href='/user/profile'">
+        <div class="user-details d-none d-md-block">
+            <h6 th:text="${user.name}">John Doe</h6>
+            <small th:text="${user.studentNo}">S001</small>
+            <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
+        </div>
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <div class="timetable-card">
+        <div class="timetable-header">
+            <h4><i class="bi bi-calendar-week me-2"></i>Academic Timetable</h4>
+            <a th:href="@{/timetable/add}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Add Class
+            </a>
+        </div>
+
+        <!-- Optional: Year/Semester selector could go here -->
+        <div class="mb-3 text-muted small" th:if="${selectedYear != null}">
+            Showing timetable for <strong th:text="${selectedYear} + ' Semester ' + ${selectedSemester}">2026 Semester 1</strong>
+        </div>
+
+        <div class="table-responsive">
+            <table class="timetable-table">
+                <thead>
+                    <tr>
+                        <th>Day / Time</th>
+                        <th th:each="time : ${times}" th:text="${time}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="day : ${days}">
+                        <td class="day-col" th:text="${day}"></td>
+                        <td class="slot-cell" th:each="time : ${times}">
+                            <th:block th:with="innerMap=${grid.get(day)}, entry=${innerMap != null ? innerMap.get(time) : null}">
+                                <div th:if="${entry != null}" class="class-box"
+                                     th:style="'background-color:' + ${entry.colorCode}">
+                                    <strong th:text="${entry.className}"></strong>
+                                    <small th:text="${entry.location}"></small>
+                                </div>
+                                <div th:if="${entry == null}" class="free-slot">
+                                    <i class="bi bi-clock me-1"></i> Free
+                                </div>
+                            </th:block>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 GradeGoal Academic Tracker. All rights reserved.</p>
+        <p class="mb-0" th:text="'Logged in as: ' + ${user.name}">Logged in as: John Doe</p>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Sidebar toggle (same as dashboard)
+    const menuToggle = document.getElementById('menuToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', function() {
+        sidebar.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeSidebar.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth <= 992 &&
+            !sidebar.contains(event.target) &&
+            !menuToggle.contains(event.target) &&
+            sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Header shadow on scroll
+    window.addEventListener('scroll', function() {
+        const header = document.getElementById('header');
+        if (window.scrollY > 10) {
+            header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+        } else {
+            header.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.05)';
+        }
+    });
+
+    // Optional: resize handler to close sidebar on desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 992 && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+</script>
+</body>
+</html>
