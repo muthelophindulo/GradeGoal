@@ -1,6 +1,7 @@
 package com.GradeGoal.model;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,4 +42,9 @@ public class TimeTable {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "studentNo", nullable = false)
     private User user;
+
+    @Transactional
+    public void onCreate(){
+
+    }
 }

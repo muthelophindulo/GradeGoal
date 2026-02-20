@@ -1,20 +1,23 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Image;
 import com.GradeGoal.model.User;
-import com.GradeGoal.service.AssessmentService;
-import com.GradeGoal.service.CourseService;
-import com.GradeGoal.service.DegreeService;
-import com.GradeGoal.service.UserService;
+import com.GradeGoal.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
+@Slf4j
 @Controller
 @RequestMapping("user/")
 public class UserController {
@@ -28,6 +31,8 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private DegreeService degreeService;
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping("profile")
     public String profile(Model model, Principal principal){
@@ -76,16 +81,34 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute User user, Principal principal,Model model){
+    public String save(@ModelAttribute User user,
+                       Principal principal,
+                       Model model,
+                       @RequestParam MultipartFile profileImage,
+                       @RequestParam(value = "removeImage", required = false, defaultValue = "false") boolean removeImage){
         String username = principal.getName();
         try{
             User currentUser = userService.getUser(username);
             currentUser.setDegree(user.getDegree());
+            if(removeImage){
+                try{
+                    log.info("image is being removed..........");
+                    imageService.deleteImage(currentUser.getStudentNo());
+                    currentUser.setImage(null);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }else {
+                log.info("image is being saved......");
+                currentUser.setImage(imageService.saveImage(profileImage,currentUser.getStudentNo()));
+            }
             currentUser.setName(user.getName());
             currentUser.setEmail(user.getEmail());
             currentUser.setSelectedYear(user.getSelectedYear());
 
+
             userService.saveUser(currentUser);
+            log.info("user saved");
 
             return "redirect:/user/profile";
         } catch (Exception e) {
@@ -165,6 +188,25 @@ public class UserController {
         }else{
             return "redirect:/user/profile";
         }
+    }
+
+    @GetMapping("/image/{studentNo}")
+    public ResponseEntity<byte[]> getUserImage(@PathVariable String studentNo){
+        User user = userService.getUser(studentNo);
+        if(user == null || user.getImage() == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        Image image = imageService.getImage(studentNo);
+        MediaType mediaType = MediaType.IMAGE_PNG;
+        if(image.getType() != null){
+            mediaType = MediaType.parseMediaType(image.getType());
+        }
+
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(image.getData());
     }
 
 }

@@ -93,17 +93,25 @@
         }
 
         .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    overflow: hidden;  /* <-- add this */
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ensures the image fills the circle without distortion */
+    display: block;    /* removes any extra space below the image */
+}
 
         .user-details {
             text-align: right;
@@ -537,7 +545,13 @@
             <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
         </div>
         <div class="user-avatar">
-            <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+            <!-- Show image if exists -->
+            <img th:if="${user.image != null}"
+                 th:src="@{'/user/image/' + ${user.studentNo}}"
+                 alt="Profile" />
+            <!-- Fallback to initial letter -->
+            <span th:if="${user.image == null}"
+                  th:text="${#strings.substring(user.name, 0, 1)}">J</span>
         </div>
     </div>
 </div>
@@ -571,7 +585,11 @@
                         <td class="slot-cell" th:each="time : ${times}">
                             <th:block th:with="innerMap=${grid.get(day)}, entry=${innerMap != null ? innerMap.get(time) : null}">
                                 <div th:if="${entry != null}" class="class-box"
-                                     th:style="'background-color:' + ${entry.colorCode}">
+                                     th:style="'background-color:' + ${entry.colorCode}"
+                                     th:data-id="${entry.id}"
+                                     th:data-classname="${entry.className}"
+                                     th:data-location="${entry.location}"
+                                     onclick="showClassOptions(this)">
                                     <strong th:text="${entry.className}"></strong>
                                     <small th:text="${entry.location}"></small>
                                 </div>
@@ -590,6 +608,30 @@
     <div class="footer">
         <p>© 2026 GradeGoal Academic Tracker. All rights reserved.</p>
         <p class="mb-0" th:text="'Logged in as: ' + ${user.name}">Logged in as: John Doe</p>
+    </div>
+</div>
+
+<!-- Modal for class options -->
+<div class="modal fade" id="classOptionsModal" tabindex="-1" aria-labelledby="classOptionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="classOptionsModalLabel">Class Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong id="modalClassName"></strong></p>
+                <p id="modalLocation"></p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="editClassBtn" class="btn btn-primary">Edit</a>
+                <form action="#" method="post" id="deleteClassForm" style="display:inline;">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -645,6 +687,28 @@
             document.body.style.overflow = 'auto';
         }
     });
+</script>
+<script>
+    function showClassOptions(element) {
+        // Retrieve data from the clicked element
+        var id = element.getAttribute('data-id');
+        var className = element.getAttribute('data-classname');
+        var location = element.getAttribute('data-location');
+
+        // Fill modal with class details
+        document.getElementById('modalClassName').innerText = className;
+        document.getElementById('modalLocation').innerText = location;
+
+        // Set the edit link (GET request)
+        document.getElementById('editClassBtn').href = '/timetable/edit/' + id;
+
+        // Set the delete form action (POST request)
+        document.getElementById('deleteClassForm').action = '/timetable/delete/' + id;
+
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById('classOptionsModal'));
+        modal.show();
+    }
 </script>
 </body>
 </html>
