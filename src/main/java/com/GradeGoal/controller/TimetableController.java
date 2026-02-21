@@ -11,9 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/timetable")
@@ -42,11 +42,29 @@ public class TimetableController {
         if (year == null) year = 2026;
         if (semester == null) semester = 1;
 
+        LocalDate date = LocalDate.now();
+
         Map<String, Map<String, TimeTable>> grid = service.getGrid(user, year, semester);
+
+        Map<String, Map<String, TimeTable>> filteredGrid = grid.entrySet()
+                .stream()
+                .map(outerEntry -> {
+                    // Filter inner map
+                    Map<String, TimeTable> filteredInner = outerEntry.getValue()
+                            .entrySet()
+                            .stream()
+                            .filter(innerEntry ->innerEntry.getValue().getAcademicYear() == innerEntry.getValue().getUser().getSelectedYear() && (date.getMonthValue() > 6?innerEntry.getValue().getSemester() ==2 :innerEntry.getValue().getSemester() == 1 ))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    // Return a new AbstractMap.SimpleEntry if inner map is not empty
+                    return filteredInner.isEmpty() ? null : new AbstractMap.SimpleEntry<>(outerEntry.getKey(), filteredInner);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         model.addAttribute("user",userService.getUser(principal.getName()));
-        model.addAttribute("grid", grid);
-        model.addAttribute("selectedYear", year);
-        model.addAttribute("selectedSemester", semester);
+        model.addAttribute("grid", filteredGrid);
+        model.addAttribute("selectedYear", user.getSelectedYear());
+        model.addAttribute("selectedSemester", date.getMonthValue() > 6? 2 : 1);
         model.addAttribute("days", Arrays.asList("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"));
         model.addAttribute("times", Arrays.asList("07:45","08:40","09:35","10:30","11:25","12:20","13:15","14:10","15:05","15:50","16:35","17:20"));
 

@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 
 @Slf4j
@@ -117,6 +118,51 @@ public class UserController {
         }
     }
 
+    @PostMapping("/update-profile")
+    public String update(@ModelAttribute User user,
+                         @RequestParam MultipartFile profileImage,
+                         @RequestParam(value = "removeImage", required = false, defaultValue = "false") boolean removeImage){
+        //get the id of the user from the form
+        Long id = user.getId();
+
+
+        //get an existing user from the databse
+        User user1 = userService.getById(id);
+
+        //if the user exists
+        if(user1 != null){
+            //user1.setImage(user.getImage());
+            user1.setDegree(user.getDegree());
+            user1.setName(user.getName());
+            user1.setSelectedYear(user.getSelectedYear());
+            user1.setPassword(user1.getPassword());
+            user1.setRole(user1.getRole());
+
+            //check if the user wants to remove the image
+            if(removeImage){
+                user1.setImage(null);
+            }else{
+                try {
+                    if(user1.getImage() == null){
+                        user1.setImage(imageService.saveImage(profileImage,user.getStudentNo()));
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+            try {
+                userService.saveUser(user1);
+                return "redirect:/user/profile";
+            }catch (Exception e){
+                return "redirect:/user/update";
+            }
+        }
+
+        return "redirect:/user/update";
+    }
     // Update password
     @GetMapping("/change")
     public String showUpdate(Model model,Principal principal){
