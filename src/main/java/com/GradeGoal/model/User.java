@@ -38,6 +38,9 @@ public class User {
     @Column(nullable = false)
     private int selectedYear;
 
+    @Column(nullable = false,columnDefinition = "integer default 1" )
+    private int selectedSemester;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Course> courses;

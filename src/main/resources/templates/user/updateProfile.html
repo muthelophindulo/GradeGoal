@@ -143,9 +143,11 @@
                     <h4>Edit Profile Information</h4>
                 </div>
 
-                <form th:action="@{/user/save}" th:object="${user}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/user/update-profile}" th:object="${user}" method="post" enctype="multipart/form-data">
                     <!-- CSRF Token -->
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <input type="hidden" th:field="*{id}" />
                     
                     <!-- Success/Error Messages -->
                     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
