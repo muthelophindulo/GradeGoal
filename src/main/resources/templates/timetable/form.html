@@ -93,17 +93,25 @@
         }
 
         .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    overflow: hidden;  /* <-- add this */
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ensures the image fills the circle without distortion */
+    display: block;    /* removes any extra space below the image */
+}
 
         .user-details {
             text-align: right;
@@ -425,7 +433,13 @@
             <div class="degree-badge" th:text="${user.degree?.name}">CS</div>
         </div>
         <div class="user-avatar">
-            <span th:text="${#strings.substring(user.name, 0, 1)}">J</span>
+            <!-- Show image if exists -->
+            <img th:if="${user.image != null}"
+                 th:src="@{'/user/image/' + ${user.studentNo}}"
+                 alt="Profile" />
+            <!-- Fallback to initial letter -->
+            <span th:if="${user.image == null}"
+                  th:text="${#strings.substring(user.name, 0, 1)}">J</span>
         </div>
     </div>
 </div>
@@ -434,7 +448,9 @@
 <div class="main-content" id="mainContent">
     <div class="form-card">
         <h3 class="text-center"><i class="bi bi-plus-circle me-2"></i>Add Timetable Entry</h3>
-        <form th:action="@{/timetable/add}" th:object="${timetable}" method="post">
+        <form th:action="${timetable.id == null} ? @{/timetable/add} : @{/timetable/update}"
+              th:object="${timetable}" method="post">
+            <input type="hidden" th:field="*{id}" />
             <div class="mb-3">
                 <label class="form-label">Class Name</label>
                 <input type="text" class="form-control" th:field="*{className}" required>

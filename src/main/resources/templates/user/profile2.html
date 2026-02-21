@@ -93,17 +93,25 @@
         }
         
         .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    overflow: hidden;  /* <-- add this */
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ensures the image fills the circle without distortion */
+    display: block;    /* removes any extra space below the image */
+}
         
         .user-details {
             text-align: right;
@@ -269,19 +277,27 @@
         }
         
         .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 5px solid white;
-            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    overflow: hidden;      /* <-- add this */
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;     /* ensures the image fills the circle without distortion */
+    display: block;        /* removes extra space below the image */
+}
         
         .profile-name {
             font-size: 2.2rem;
@@ -998,7 +1014,13 @@
                 <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
             </div>
             <div class="user-avatar">
-                <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+                <!-- Show image if exists -->
+                <img th:if="${user.image != null}"
+                     th:src="@{'/user/image/' + ${user.studentNo}}"
+                     alt="Profile" />
+                <!-- Fallback to initial letter -->
+                <span th:if="${user.image == null}"
+                      th:text="${#strings.substring(user.name, 0, 1)}">J</span>
             </div>
         </div>
     </div>
@@ -1010,11 +1032,16 @@
             <!-- Profile Header -->
             <div class="profile-header">
                 <div class="profile-avatar">
-                    <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+
+                    <img th:if="${user.image != null}"
+                         th:src="@{'/user/image/' + ${user.studentNo}}"
+                         alt="Profile" />
+
+                    <span th:if="${user.image == null}" th:text="${#strings.substring(user.name, 0, 1)}">U</span>
                 </div>
                 <h1 class="profile-name" th:text="${user.name}">John Doe</h1>
                 <p class="profile-title" th:text="${user.degree?.name} + ' Student'">Computer Science Student</p>
-                <p class="profile-title" th:text="'Student No: ' + ${user.studentNo}">STU2024001</p>
+                <p class="profile-title" th:text="'Student No: ' + ${user.studentNo}">22400401</p>
                 
                 <div class="profile-stats">
                     <div class="stat-item">

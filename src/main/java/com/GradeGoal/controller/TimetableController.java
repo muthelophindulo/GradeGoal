@@ -26,6 +26,7 @@ public class TimetableController {
     @Autowired
     private UserService userService;
 
+
     // Predefined lists for days and times – now in controller
     private static final List<String> DAYS = Arrays.asList("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY");
     private static final List<String> TIMES = Arrays.asList("07:45","08:40","09:35","10:30","11:25","12:20","13:15","14:10","15:05","15:50","16:35","17:20");
@@ -92,6 +93,33 @@ public class TimetableController {
         Integer semester = entry.getSemester();
         repository.deleteById(id);
         return "redirect:/timetable/view?year=" + year + "&semester=" + semester;
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(Model model,Principal principal,@PathVariable Long id){
+        User user = userService.getUser(principal.getName());
+
+        model.addAttribute("user",user);
+        model.addAttribute("timetable",repository.getById(id));
+        model.addAttribute("days", DAYS);
+        model.addAttribute("times", TIMES);
+
+        return "timetable/form";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute TimeTable timeTable,Principal principal,RedirectAttributes redirectAttributes){
+        //get the entry from the database
+        TimeTable existingEntry = repository.getReferenceById(timeTable.getId());
+        if(existingEntry == null){
+            redirectAttributes.addFlashAttribute("errorMessage","the entry does not exists");
+            return "redirect:/timetable/view";
+        }
+
+        timeTable.setUser(userService.getUser(principal.getName()));
+        repository.save(timeTable);
+        redirectAttributes.addFlashAttribute("successMessage","successfully edited entry");
+        return "redirect:/timetable/view";
     }
 }
 

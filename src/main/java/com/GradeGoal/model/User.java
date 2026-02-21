@@ -63,6 +63,10 @@ public class User {
     @ToString.Exclude
     private List<ResetPasswordToken> tokens;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, optional = false,fetch = FetchType.LAZY,orphanRemoval = true)
+    @ToString.Exclude
+    private Image image;
+
     @PrePersist
     private void onCreate(){
         this.selectedYear = LocalDate.now().getYear();

@@ -121,7 +121,13 @@
                 <div class="degree-badge" th:text="${user.degree?.name}">Degree</div>
             </div>
             <div class="user-avatar">
-                <span th:text="${#strings.substring(user.name, 0, 1)}">U</span>
+                <!-- Show image if exists -->
+                <img th:if="${user.image != null}"
+                     th:src="@{'/user/image/' + ${user.studentNo}}"
+                     alt="Profile" />
+                <!-- Fallback to initial letter -->
+                <span th:if="${user.image == null}"
+                      th:text="${#strings.substring(user.name, 0, 1)}">J</span>
             </div>
         </div>
     </div>
@@ -136,8 +142,8 @@
                     <i class="bi bi-pencil-square"></i>
                     <h4>Edit Profile Information</h4>
                 </div>
-                
-                <form th:action="@{/user/save}" th:object="${user}" method="post" id="editProfileForm">
+
+                <form th:action="@{/user/save}" th:object="${user}" method="post" enctype="multipart/form-data">
                     <!-- CSRF Token -->
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     
@@ -183,6 +189,45 @@
                             <div class="form-text">University email address</div>
                             <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback d-block">
                                 <span th:errors="*{email}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Picture Section -->
+                    <div class="section-header">
+                        <h5><i class="bi bi-image me-2"></i>Profile Picture</h5>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <!-- Current picture preview -->
+                                <div class="profile-preview"
+                                     style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary-color);">
+                                    <img th:if="${user.image != null}"
+                                         th:src="@{'/user/image/' + ${user.studentNo}}"
+                                         alt="Profile"
+                                         style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <div th:if="${user.image == null}"
+                                         class="d-flex align-items-center justify-content-center bg-light text-muted"
+                                         style="width: 100%; height: 100%; font-size: 0.9rem;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <label for="profileImage" class="form-label">Change Profile Picture</label>
+                                    <input type="file" class="form-control" id="profileImage" name="profileImage" accept="image/*">
+                                    <div class="form-text">Accepted formats: JPG, PNG, GIF. Max size 5MB.</div>
+
+                                    <!-- Remove button (only shown if an image exists) -->
+                                    <div th:if="${user.image != null}" class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeImageBtn">
+                                            <i class="bi bi-trash"></i> Remove Current Picture
+                                        </button>
+                                        <!-- Hidden field to signal removal on form submission -->
+                                        <input type="hidden" name="removeImage" id="removeImage" value="false">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,5 +318,41 @@
     
     <!-- Custom JavaScript -->
     <script th:src="@{/js/edit-profile.js}"></script>
+    <script>
+        // Preview selected image
+        document.getElementById('profileImage')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImg = document.querySelector('.profile-preview img');
+                    const previewPlaceholder = document.querySelector('.profile-preview .bg-light');
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = 'block';
+                        if (previewPlaceholder) previewPlaceholder.style.display = 'none';
+                    } else {
+                        // If no image element exists (user had no picture), create one
+                        const previewDiv = document.querySelector('.profile-preview');
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle remove button
+        document.getElementById('removeImageBtn')?.addEventListener('click', function() {
+            // Set hidden field to true
+            document.getElementById('removeImage').value = 'true';
+
+            // Update preview to show placeholder
+            const previewDiv = document.querySelector('.profile-preview');
+            previewDiv.innerHTML = `<div class="d-flex align-items-center justify-content-center bg-light text-muted" style="width: 100%; height: 100%; font-size: 0.9rem;"><i class="bi bi-person"></i></div>`;
+
+            // Clear file input
+            document.getElementById('profileImage').value = '';
+        });
+    </script>
 </body>
 </html>
