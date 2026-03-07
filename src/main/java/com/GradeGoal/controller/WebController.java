@@ -3,7 +3,7 @@ package com.GradeGoal.controller;
 import com.GradeGoal.model.Assessment;
 import com.GradeGoal.model.Course;
 import com.GradeGoal.model.ResetPasswordToken;
-import com.GradeGoal.model.User;
+import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 @Controller
@@ -33,6 +31,8 @@ public class WebController {
     private ResetTokenService resetTokenService;
     @Autowired
     private ResendService resendService;
+    @Autowired
+    private TermsRepository termsRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model,Principal principal){
@@ -40,7 +40,9 @@ public class WebController {
 
         String loggedInUser = principal.getName();
 
-
+        if(!termsRepository.findByStudentNo(loggedInUser).isAccepted()){
+            return "redirect:/terms";
+        }
         if(userService.getUser(loggedInUser).getCourses().isEmpty() ){
             return "redirect:/course/new";
         }else {
