@@ -1,7 +1,9 @@
 package com.GradeGoal.controller;
 
 import com.GradeGoal.model.Degree;
+import com.GradeGoal.model.Terms;
 import com.GradeGoal.model.User;
+import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.DegreeService;
 import com.GradeGoal.service.ResendService;
 import com.GradeGoal.service.UserService;
@@ -27,6 +29,8 @@ public class RegisterController {
     private UserService userService;
     @Autowired
     private ResendService resendService;
+    @Autowired
+    private TermsRepository termsRepository;
 
     @GetMapping("/register")
     public String register(Model model){
@@ -68,6 +72,11 @@ public class RegisterController {
             redirectAttributes.addFlashAttribute("successMessage",
                     "Registration successful! You can now login.");
             resendService.sendWelcomeEmail(user.getEmail());
+
+            Terms terms = new Terms();
+            terms.setStudentNo(user.getStudentNo());
+            terms.setAccepted(false);
+            termsRepository.save(terms);
             return "redirect:/login";
 
         } catch (Exception e) {
