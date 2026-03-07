@@ -33,6 +33,12 @@ IDE: IntelliJ IDEA
 - Get letter grade based on course mark
 
 - Auto calculate average grade of courses and assessments
+## 🗓️ Time Table
+- Add classes
+
+- Delete classes
+
+- Edit classes
 
 ## 📱 User Experience
 - Clean, intuitive interface
