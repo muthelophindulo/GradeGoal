@@ -29,7 +29,7 @@ public class TermsController {
             t.setAccepted(true);
 
             if(termsRepository.save(t) != null){
-                return "redirect:/dashboard";
+                return "redirect:/privacy";
             }else{
                 return "redirect:/terms";
             }
@@ -37,5 +37,16 @@ public class TermsController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GetMapping("/privacy")
+    public String showPrivacy(Model model){
+        model.addAttribute("lastUpdated","07 March 2026");
+        return "privacy";
+    }
+
+    @PostMapping("/accept-privacy")
+    public String acceptPrivacy(Model model, Principal principal){
+        return "redirect:/dashboard";
     }
 }
