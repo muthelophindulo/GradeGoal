@@ -113,6 +113,9 @@ public class AssessmentService {
                 .filter(assessment -> assessment
                         .getDate()
                         .getYear() == userService.getUser(user).getSelectedYear())
+                .toList()
+                .stream()
+                .sorted(Comparator.comparing(Assessment::getDate))
                 .toList();
     }
 
