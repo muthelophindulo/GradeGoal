@@ -237,9 +237,9 @@ public class UserController {
     }
 
     @GetMapping("/image/{studentNo}")
-    public ResponseEntity<byte[]> getUserImage(@PathVariable String studentNo){
+    public ResponseEntity<byte[]> getUserImage(@PathVariable String studentNo,Principal principal){
         User user = userService.getUser(studentNo);
-        if(user == null || user.getImage() == null){
+        if(user == null || user.getImage() == null || !(studentNo.equals(principal.getName()))){
             return ResponseEntity.notFound().build();
         }
 

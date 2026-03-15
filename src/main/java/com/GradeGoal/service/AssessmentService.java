@@ -116,7 +116,7 @@ public class AssessmentService {
                 .toList()
                 .stream()
                 .sorted(Comparator.comparing(Assessment::getDate))
-                .toList();;
+                .toList();
     }
 
 }
