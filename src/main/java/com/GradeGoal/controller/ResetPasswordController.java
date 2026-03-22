@@ -1,5 +1,6 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.ResetPasswordToken;
 import com.GradeGoal.model.User;
 import com.GradeGoal.service.ResetTokenService;
 import com.GradeGoal.service.UserService;
@@ -10,6 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/reset")
@@ -25,12 +29,10 @@ public class ResetPasswordController {
     public String resetPasswordForm(@PathVariable String token, Model model){
         //verify if the token exists in the database
         try{
-            boolean isValid = resetTokenService.getToken(token).isUsed();
+            boolean isUsed = resetTokenService.getToken(token).isUsed(); //will return true if is used and false if not used
 
-            if(isValid){
-                System.out.println("form called");
+            if(!isUsed){ //check if not used
                 model.addAttribute("token",token);
-                System.out.println(resetTokenService.getToken(token).getUser());
                 model.addAttribute("user",resetTokenService.getToken(token).getUser());
                 return "resetPassword/form";
             }else if(resetTokenService.getToken(token) == null){
@@ -61,6 +63,9 @@ public class ResetPasswordController {
         try {
             User currentuser = userService.getUser(username);
             currentuser.setPassword(passwordEncoder.encode(password));
+            List<ResetPasswordToken> userTokens = currentuser.getTokens();
+            userTokens.forEach(resetPasswordToken -> resetPasswordToken.setUsed(true));
+            currentuser.setTokens(userTokens);
             userService.saveUser(currentuser);
             return "redirect:/login";
         } catch (Exception e) {
