@@ -29,14 +29,10 @@ public class ResetPasswordController {
     public String resetPasswordForm(@PathVariable String token, Model model){
         //verify if the token exists in the database
         try{
-            boolean isUsed = resetTokenService.getToken(token).isUsed(); //will return true if is used and false if not used
-
-            if(!isUsed){ //check if not used
+            if(!resetTokenService.isUsed(token)){
                 model.addAttribute("token",token);
-                model.addAttribute("user",resetTokenService.getToken(token).getUser());
+                model.addAttribute("user",resetTokenService.getToken(resetTokenService.hashToken(token)).getUser());
                 return "resetPassword/form";
-            }else if(resetTokenService.getToken(token) == null){
-                return "resetPasswordError";
             }else{
                 return "resetPasswordError";
             }
