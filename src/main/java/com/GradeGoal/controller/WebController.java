@@ -107,15 +107,19 @@ public class WebController {
                 return "redirect:/forgot-password";
             }else{
                 ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
-                resetPasswordToken.setToken(UUID.randomUUID().toString());
+
+                String rawToken = UUID.randomUUID().toString();
+
+
                 resetPasswordToken.setUser(userService.getByEmail(email));
+                resetPasswordToken.setToken(resetTokenService.hashToken(rawToken));
                 resetPasswordToken.setExpiry_date(LocalDateTime.now().plusHours(24));
 
                 resetTokenService.save(resetPasswordToken);
 
                 redirectAttributes.addFlashAttribute("passwordResetSuccess", "If an account exists with this email, you will receive a password reset link shortly.");
 
-                String url = "www.gradegoal.co.za/reset/" + resetPasswordToken.getToken();
+                String url = "www.gradegoal.co.za/reset/" + rawToken;
                 resendService.sendResetEmail(url,email);
 
                 return "redirect:/forgot-password";
