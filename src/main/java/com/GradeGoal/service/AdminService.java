@@ -20,11 +20,11 @@ public class AdminService {
     }
 
     @Transactional
-    public Admin saveUser(Admin admin){
+    public Admin saveAdmin(Admin admin){
         return adminRepository.save(admin);
     }
 
-    public void deleteUser(Admin admin){
+    public void deleteAdmin(Admin admin){
         adminRepository.deleteById(admin.getId());
     }
 
