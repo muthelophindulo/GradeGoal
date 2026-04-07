@@ -26,4 +26,8 @@ public class Image {
     @JoinColumn(referencedColumnName = "studentNo",name = "user_id")
     @ToString.Exclude
     private User user;
+
+    @OneToOne
+    @ToString.Exclude
+    private Admin admin;
 }

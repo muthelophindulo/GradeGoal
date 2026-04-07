@@ -4,6 +4,9 @@ import com.GradeGoal.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -18,10 +21,22 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdminDetailService adminDetailService;
+    @Autowired
+    private UserDetailService userDetailService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        DaoAuthenticationProvider adminProvider = new DaoAuthenticationProvider(adminDetailService);
+        adminProvider.setPasswordEncoder(passwordEncoder());
+
+        DaoAuthenticationProvider userProvider = new DaoAuthenticationProvider(userDetailService);
+        userProvider.setPasswordEncoder(passwordEncoder());
+
+        AuthenticationManager authenticationManager = new ProviderManager(adminProvider,userProvider);
         http
+                .authenticationManager(authenticationManager)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
@@ -38,12 +53,6 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/swagger-ui/**").permitAll()
-                        .requestMatchers(
-                                "/dashboard",
-                                "/assessment/**",
-                                "/assessment",
-                                "/timetable/**",
-                                "/timetable/").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -65,23 +74,6 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> {
-            com.GradeGoal.model.User userf = userRepository.findByStudentNo(username);
-
-            if(userf == null){
-                throw new UsernameNotFoundException("User not found with student number: " + username);
-            }
-
-            return User
-                    .withUsername(userf.getStudentNo())
-                    .password(userf.getPassword())
-                    .roles(userf.getRole())
-                    .build();
-        };
     }
 
     @Bean
