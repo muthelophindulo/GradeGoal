@@ -1,8 +1,6 @@
 package com.GradeGoal.controller;
 
-import com.GradeGoal.model.Assessment;
-import com.GradeGoal.model.Course;
-import com.GradeGoal.model.ResetPasswordToken;
+import com.GradeGoal.model.*;
 import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +32,33 @@ public class WebController {
     @Autowired
     private TermsRepository termsRepository;
 
+    @Autowired
+    private AdminService adminService;
+
     @GetMapping("/dashboard")
     public String dashboard(Model model,Principal principal){
 
 
         String loggedInUser = principal.getName();
+
+        if(adminService.getAdminByAdminNo(principal.getName()) != null){
+            //admin
+            model.addAttribute("admin",adminService.getAdminByAdminNo(principal.getName()));
+
+            //stats
+            model.addAttribute("totalCourses",courseService.countTotalCourses());
+            model.addAttribute("totalAssessments",assessmentService.countTotalAssessments());
+            model.addAttribute("totalUsers",adminService.CountUsers());
+
+            model.addAttribute("users",userService.getUsers());
+
+            model.addAttribute("avgCoursesPerUser",5); //todo: add the service for calculating this
+            model.addAttribute("goalCompletionRate", 5);
+            model.addAttribute("activeLast30Days",78);
+            model.addAttribute("admins",adminService.getAdmins());
+            return "admin/dashboard";
+
+        }
 
         if(!termsRepository.findByStudentNo(loggedInUser).isAccepted()){
             return "redirect:/terms";

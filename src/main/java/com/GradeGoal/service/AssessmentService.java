@@ -119,4 +119,8 @@ public class AssessmentService {
                 .toList();
     }
 
+    public int countTotalAssessments(){
+        return assessmentRepository.findAll().size();
+    }
+
 }

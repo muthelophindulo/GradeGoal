@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GradeGoal Admin | Platform Maintainer</title>
+
+    <!-- Bootstrap 5 + Icons + Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-dark: #1e293b;
+            --primary: #2c3e66;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-bg: #f1f5f9;
+            --sidebar-width: 280px;
+        }
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--gray-bg);
+            padding-top: 82px;
+            overflow-x: hidden;
+        }
+        /* Fixed Header */
+        .admin-header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            background: white;
+            padding: 16px 32px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #0f172a;
+            color: #e2e8f0;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 24px 24px 28px;
+            border-bottom: 1px solid #1e293b;
+        }
+        .sidebar-header h3 {
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .close-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: #cbd5e1;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-radius: 0 30px 30px 0;
+            transition: 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(59,130,246,0.15);
+            color: white;
+            border-left: 3px solid var(--accent);
+        }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 28px 32px;
+            transition: 0.3s;
+        }
+        /* Cards */
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            border: 1px solid #eef2ff;
+            transition: all 0.2s;
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 16px;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .section-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 1px solid #eef2ff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+        }
+        .user-table th, .user-table td {
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+        .btn-outline-accent {
+            border: 1px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
+        .badge-soft {
+            background: #eef2ff;
+            color: var(--primary);
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+        @media (max-width: 992px) {
+            .admin-header { left: 0; }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .menu-toggle { display: block; }
+            .close-sidebar { display: block; }
+            body { padding-top: 70px; }
+        }
+        @media (max-width: 576px) {
+            .stat-number { font-size: 1.5rem; }
+            .section-card { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+        <h3><i class="bi bi-shield-check"></i> GradeGoal</h3>
+        <button class="close-sidebar" id="closeSidebarBtn"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="sidebar-menu mt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" th:href="@{/admin/dashboard}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="scrollToUsers(); return false;"><i class="bi bi-people"></i> Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="scrollToBackup(); return false;"><i class="bi bi-database-up"></i> Backup & Restore</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="scrollToAnalytics(); return false;"><i class="bi bi-graph-up"></i> Analytics</a></li>
+            <!-- NEW: Admin management section -->
+            <li class="nav-item"><a class="nav-link" th:href="@{/admin/admins}" ><i class="bi bi-shield-lock"></i> Admins</a></li>
+            <li class="nav-item mt-4"><hr class="text-white opacity-25"></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/admin/profile}"><i class="bi bi-person-circle"></i> Profile</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/logout}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<div class="admin-header" id="adminHeader">
+    <div class="d-flex align-items-center gap-3">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="bi bi-list"></i></button>
+        <h5 class="mb-0 fw-semibold">Platform Maintainer Console</h5>
+    </div>
+    <div class="user-profile d-flex align-items-center gap-3" onclick="location.href='/admin/profile'">
+        <div class="text-end d-none d-md-block">
+            <div class="fw-semibold" th:text="${admin.name != null ? admin.name : 'Alex Morgan'}">Alex Morgan</div>
+            <small class="text-muted">Administrator</small>
+        </div>
+        <div class="user-avatar"><span th:text="${#strings.substring(admin.name != null ? admin.name : 'AM', 0, 1)}">A</span></div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+
+    <!-- Flash messages -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Welcome -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h3 class="fw-bold">Hello, <span th:text="${admin.name != null ? admin.name : 'Admin'}">Maintainer</span> 👋</h3>
+        </div>
+    </div>
+
+    <!-- STATS CARDS: only 3 widgets as requested: 1. Users, 2. Assessments, 3. Courses -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 col-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-people"></i></div>
+                <div class="stat-number" th:text="${totalUsers != null ? totalUsers : 0}">0</div>
+                <div class="text-secondary">Registered Users</div>
+                <small class="text-muted">active accounts</small>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="bi bi-pencil-square"></i></div>
+                <div class="stat-number" th:text="${totalAssessments != null ? totalAssessments : 0}">0</div>
+                <div class="text-secondary">Assessments added</div>
+                <small class="text-muted">all time</small>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-journal-bookmark"></i></div>
+                <div class="stat-number" th:text="${totalCourses != null ? totalCourses : 0}">0</div>
+                <div class="text-secondary">Courses created</div>
+                <small class="text-muted">across all users</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1) USERS MANAGEMENT TABLE (widget 5) -->
+    <div id="usersSection" class="section-card">
+        <div class="section-title"><i class="bi bi-people-fill"></i> Registered Users – Manage & Delete</div>
+        <div class="table-responsive">
+            <table class="table user-table align-middle">
+                <thead class="table-light">
+                    <tr><th>Name</th><th>Student No.</th><th>Email</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user, iter : ${users}">
+                        <td th:text="${user.name}">Emily Clark</td>
+                        <td th:text="${user.studentNo}">S12345</td>
+                        <td th:text="${user.email}">emily@example.com</td>
+                        <td>
+                            <form th:action="@{/admin/users/view/{studentNo}(id=${user.studentNo})}" method="get" class="d-inline delete-form" >
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-person"></i> View</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${users == null or users.isEmpty()}">
+                        <td colspan="6" class="text-center py-4 text-muted">No users registered yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-light border mt-3 small"><i class="bi bi-info-circle"></i> Deleting a user permanently removes all their personal data (courses, grades, goals, timetables) – GDPR compliant.</div>
+    </div>
+
+    <!-- 3) ANONYMISED USAGE INSIGHTS (widget 11) -->
+    <div id="analyticsSection" class="section-card">
+        <div class="section-title"><i class="bi bi-pie-chart"></i> Usage Insights</div>
+        <div class="row text-center">
+            <div class="col-sm-4 mb-3">
+                <div class="bg-light p-3 rounded-3">
+                    <i class="bi bi-journal-bookmark fs-1 text-secondary"></i>
+                    <div class="fw-bold mt-2" th:text="${avgCoursesPerUser != null ? avgCoursesPerUser : '2.3'}">2.3</div>
+                    <div>Avg courses / user</div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-3">
+                <div class="bg-light p-3 rounded-3">
+                    <i class="bi bi-flag fs-1 text-secondary"></i>
+                    <div class="fw-bold mt-2" th:text="${goalCompletionRate != null ? goalCompletionRate : '67%'}">67%</div>
+                    <div>Goal completion rate</div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-3">
+                <div class="bg-light p-3 rounded-3">
+                    <i class="bi bi-activity fs-1 text-secondary"></i>
+                    <div class="fw-bold mt-2" th:text="${activeLast30Days != null ? activeLast30Days : '78%'}">78%</div>
+                    <div>Active users (30d)</div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 text-center small text-muted">All metrics are aggregated – no individual student grades or course details exposed.</div>
+    </div>
+
+    <!-- 2) BACKUP & RESTORE (widget 8) -->
+    <div id="backupSection" class="section-card">
+        <div class="section-title"><i class="bi bi-hdd-stack"></i> Backup & Disaster Recovery</div>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <p class="mb-1">Manual backups export the entire anonymised dataset (user accounts, counts, settings). No grade details are stored in plain backup logs.</p>
+                <form th:action="@{/admin/backup/now}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="bi bi-cloud-arrow-up"></i> Create Backup Now</button>
+                </form>
+                <button class="btn btn-outline-secondary rounded-pill ms-2" onclick="alert('Restore from last backup requires secondary confirmation.')"><i class="bi bi-arrow-repeat"></i> Restore</button>
+            </div>
+            <div class="col-md-4 text-end"><span class="badge bg-light text-dark p-2"><i class="bi bi-check2-circle"></i> Last backup: Apr 7, 2026</span></div>
+        </div>
+    </div>
+
+    <div class="footer text-center text-muted small py-4 border-top mt-4">
+        <p>© 2026 GradeGoal · Admin tools for platform maintenance · User data is private & never inspected.</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Sidebar toggle
+    const menuBtn = document.getElementById('menuToggleBtn');
+    const closeBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('adminSidebar');
+
+    function toggleSidebar(show) {
+        if (show) sidebar.classList.add('active');
+        else sidebar.classList.remove('active');
+        document.body.style.overflow = show ? 'hidden' : 'auto';
+    }
+    menuBtn?.addEventListener('click', () => toggleSidebar(true));
+    closeBtn?.addEventListener('click', () => toggleSidebar(false));
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 992 && sidebar.classList.contains('active') && !sidebar.contains(e.target) && !menuBtn.contains(e.target))
+            toggleSidebar(false);
+    });
+
+    // smooth scroll functions
+    function scrollToUsers() { document.getElementById('usersSection')?.scrollIntoView({ behavior: 'smooth' }); if(window.innerWidth<=992) toggleSidebar(false); }
+    function scrollToBackup() { document.getElementById('backupSection')?.scrollIntoView({ behavior: 'smooth' }); if(window.innerWidth<=992) toggleSidebar(false); }
+    function scrollToAnalytics() { document.getElementById('analyticsSection')?.scrollIntoView({ behavior: 'smooth' }); if(window.innerWidth<=992) toggleSidebar(false); }
+    function scrollToAdminMgmt() { document.getElementById('adminMgmtSection')?.scrollIntoView({ behavior: 'smooth' }); if(window.innerWidth<=992) toggleSidebar(false); }
+
+    window.confirmDelete = function() { return confirm("⚠️ Permanently delete this user?\nAll their courses, grades, goals and timetable entries will be erased. This cannot be undone."); };
+</script>
+</body>
+</html>

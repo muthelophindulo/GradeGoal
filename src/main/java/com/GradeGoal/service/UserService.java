@@ -1,5 +1,7 @@
 package com.GradeGoal.service;
 
+import com.GradeGoal.Dto.UserDto;
+import com.GradeGoal.Mapper.UserMapper;
 import com.GradeGoal.model.Course;
 import com.GradeGoal.model.User;
 import com.GradeGoal.repository.UserRepository;
@@ -34,6 +36,10 @@ public class UserService {
 
     public User getUser(String studNo){
         return userRepository.findByStudentNo(studNo);
+    }
+
+    public List<UserDto> getUsers(){
+        return UserMapper.mapToDtos(userRepository.findAll());
     }
 
     public double AverageGrade(String studNo){
