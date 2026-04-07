@@ -164,4 +164,8 @@ public class CourseService {
         return Math.round(average / courses.size());
 
     }
+
+    public int countTotalCourses(){
+        return courseRepository.findAll().size();
+    }
 }
