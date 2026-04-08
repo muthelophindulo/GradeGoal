@@ -40,6 +40,8 @@ public class AdminService {
     }
 
     public AdminDto getAdminByAdminNo(String adminNo){
+        if(adminRepository.findByAdminNo(adminNo) == null)
+            return null;
         return AdminMapper.mapToDto(adminRepository.findByAdminNo(adminNo));
     }
 
