@@ -222,7 +222,7 @@
     <div class="user-profile d-flex align-items-center gap-3" onclick="location.href='/admin/profile'">
         <div class="text-end d-none d-md-block">
             <div class="fw-semibold" th:text="${admin.name != null ? admin.name : 'Alex Morgan'}">Alex Morgan</div>
-            <small class="text-muted">Administrator</small>
+            <small class="text-muted" th:text="${admin.role}">Administrator</small>
         </div>
         <div class="user-avatar"><span th:text="${#strings.substring(admin.name != null ? admin.name : 'AM', 0, 1)}">A</span></div>
     </div>

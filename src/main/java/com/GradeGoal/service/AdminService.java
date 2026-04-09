@@ -23,16 +23,19 @@ public class AdminService {
     private AssessmentService assessmentService;
 
     public AdminDto saveAdmin(Admin admin){
-        LocalDate date = LocalDate.now();
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-        System.out.println();
-        admin.setAdminNo("ADM" + Integer.toString(date.getYear()).substring(2,4) +"0"+ date.getMonthValue());
-        adminRepository.save(admin);
 
-        Admin savedAdmin = adminRepository.findByName(admin.getName());
-        savedAdmin.setAdminNo(savedAdmin.getAdminNo() + (savedAdmin.getId() < 10 ? "0" + savedAdmin.getId() : savedAdmin.getId()));
-        Admin saved2 = adminRepository.save(savedAdmin);
-        return AdminMapper.mapToDto(saved2);
+        //logic for creating adminNo
+        LocalDate date = LocalDate.now();
+        String yy = String.valueOf(date.getYear()).substring(2,4);
+        String mm = "0"+String.valueOf(date.getMonthValue());
+        String adminNo = "ADM" + yy;
+
+        Admin admin1 = adminRepository.save(admin);
+
+        admin1.setAdminNo(adminNo + (admin1.getId() < 10 ? "0"+admin1.getId() : admin1.getId()) + mm);
+
+        return AdminMapper.mapToDto(adminRepository.save(admin1));
     }
 
     public void deleteAdmin(String adminNo){

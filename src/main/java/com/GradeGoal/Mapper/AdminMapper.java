@@ -17,7 +17,8 @@ public class AdminMapper {
                 admin.getAdminNo(),
                 admin.getName(),
                 admin.getEmail(),
-                admin.getCellNo()
+                admin.getCellNo(),
+                admin.getRole()
         );
     }
 
@@ -32,7 +33,8 @@ public class AdminMapper {
                 admin.getAdminNo(),
                 admin.getName(),
                 admin.getEmail(),
-                admin.getCellNo()
+                admin.getCellNo(),
+                admin.getRole()
         )));
 
         return adminDtoList;
