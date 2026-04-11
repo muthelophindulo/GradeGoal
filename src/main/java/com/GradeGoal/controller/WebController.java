@@ -1,5 +1,6 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.Dto.AdminDto;
 import com.GradeGoal.model.*;
 import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.*;

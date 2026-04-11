@@ -60,7 +60,7 @@ public class AdminController {
         AdminDto admin1 = adminService.saveAdmin(admin);
 
         if(admin1 != null){
-            return "redirect:/admin/list";
+            return "redirect:/admin/admins";
         }
 
         return "redirect:/admin/form";
