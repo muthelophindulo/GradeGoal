@@ -1,8 +1,13 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.Mapper.AdminMapper;
+import com.GradeGoal.Mapper.UserMapper;
+import com.GradeGoal.model.Action;
 import com.GradeGoal.model.Assessment;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.service.AssessmentService;
 import com.GradeGoal.service.CourseService;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,9 +24,10 @@ public class AssessmentController {
     private UserService userService;
     @Autowired
     private AssessmentService assessmentService;
-
     @Autowired
     private CourseService courseService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("list")
     public String List(Model model, Principal principal){
@@ -62,6 +68,12 @@ public class AssessmentController {
             assessment.setUser(userService.getUser(principal.getName()));
             assessmentService.saveAssessment(assessment);
 
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.CREATED.toString());
+            log.setDescription("created a new assessment");
+            logService.saveLog(log);
+
             return "redirect:/assessment/list";
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -86,6 +98,12 @@ public class AssessmentController {
             assessment.setUser(userService.getUser(principal.getName()));
             assessmentService.saveAssessment(assessment);
 
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.EDITED.toString());
+            log.setDescription("edited an assessment");
+            logService.saveLog(log);
+
             return "redirect:/assessment/list";
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -93,9 +111,15 @@ public class AssessmentController {
     }
 
     @GetMapping("delete/{id}")
-    public String deleteAssessment(@PathVariable Long id){
+    public String deleteAssessment(@PathVariable Long id,Principal principal){
         try{
             assessmentService.deleteAssessment(assessmentService.getAssessment(id));
+
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.DELETED.toString());
+            log.setDescription("deleted an assessment");
+            logService.saveLog(log);
         }catch (Exception e){
             System.out.println("could not delete Assessment " +e.getMessage());
         }

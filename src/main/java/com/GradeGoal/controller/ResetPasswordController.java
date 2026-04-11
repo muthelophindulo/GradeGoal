@@ -1,7 +1,10 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.model.ResetPasswordToken;
 import com.GradeGoal.model.User;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.ResetTokenService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,8 @@ public class ResetPasswordController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("/{token}")
     public String resetPasswordForm(@PathVariable String token, Model model){
@@ -63,6 +68,13 @@ public class ResetPasswordController {
             userTokens.forEach(resetPasswordToken -> resetPasswordToken.setUsed(true));
             currentuser.setTokens(userTokens);
             userService.saveUser(currentuser);
+
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.EDITED.toString());
+            log.setDescription("updated password");
+            logService.saveLog(log);
+
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error","something went wrong" + e.getMessage());

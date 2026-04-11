@@ -1,10 +1,9 @@
 package com.GradeGoal.controller;
 
-import com.GradeGoal.model.Degree;
-import com.GradeGoal.model.Terms;
-import com.GradeGoal.model.User;
+import com.GradeGoal.model.*;
 import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.DegreeService;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.ResendService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +30,8 @@ public class RegisterController {
     private ResendService resendService;
     @Autowired
     private TermsRepository termsRepository;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("/register")
     public String register(Model model){
@@ -77,6 +78,13 @@ public class RegisterController {
             terms.setStudentNo(user.getStudentNo());
             terms.setAccepted(false);
             termsRepository.save(terms);
+
+            Log log = new Log();
+            log.setUser(user);
+            log.setAction(Action.CREATED.toString());
+            log.setDescription("registered");
+            logService.saveLog(log);
+
             return "redirect:/login";
 
         } catch (Exception e) {

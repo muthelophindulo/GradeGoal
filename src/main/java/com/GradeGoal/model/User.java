@@ -70,6 +70,10 @@ public class User {
     @ToString.Exclude
     private Image image;
 
+    @OneToMany(mappedBy = "log",cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+    @ToString.Exclude
+    private List<Log> logs;
+
     @PrePersist
     private void onCreate(){
         this.selectedYear = LocalDate.now().getYear();

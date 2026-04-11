@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -37,4 +39,8 @@ public class Admin {
     @JoinColumn(referencedColumnName = "id", name = "image_id")
     @ToString.Exclude
     private Image image;
+
+    @OneToMany(mappedBy = "log",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+    @ToString.Exclude
+    private List<Log> logs;
 }
