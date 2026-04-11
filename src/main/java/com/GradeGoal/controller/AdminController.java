@@ -69,7 +69,7 @@ public class AdminController {
         if(admin1 != null){
 
             Log log = new Log();
-            log.setAdmin(AdminMapper.maptoAdmin(adminService.getAdminByAdminNo(principal.getName())));
+            log.setAdmin(adminService.getAdmin(principal.getName()));
             log.setAction(Action.CREATED.toString());
             log.setDescription("created a new admin");
             logService.saveLog(log);

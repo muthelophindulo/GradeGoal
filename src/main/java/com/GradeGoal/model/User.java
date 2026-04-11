@@ -70,7 +70,7 @@ public class User {
     @ToString.Exclude
     private Image image;
 
-    @OneToMany(mappedBy = "log",cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
     @ToString.Exclude
     private List<Log> logs;
 
