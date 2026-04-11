@@ -1,9 +1,12 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
 import com.GradeGoal.model.Assessment;
 import com.GradeGoal.model.Course;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.service.AssessmentService;
 import com.GradeGoal.service.CourseService;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,12 +24,12 @@ import java.util.Objects;
 public class CourseController {
     @Autowired
     private CourseService courseService;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private AssessmentService assessmentService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("list")
     public String list(Model model, Principal principal){
@@ -53,6 +56,12 @@ public class CourseController {
         String logginuser = principal.getName();
         course.setUser(userService.getUser(logginuser));
         courseService.saveCourse(course);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.CREATED.toString());
+        log.setDescription("created a new course");
+        logService.saveLog(log);
 
         return "redirect:/course/list";
     }
@@ -89,8 +98,14 @@ public class CourseController {
     }
 
     @GetMapping("delete/{id}")
-    public String delete(@PathVariable Long id){
+    public String delete(@PathVariable Long id,Principal principal){
         courseService.delete(id);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.DELETED.toString());
+        log.setDescription("created a new course");
+        logService.saveLog(log);
         return "redirect:/course/list";
     }
 
@@ -99,6 +114,12 @@ public class CourseController {
         String logginuser = principal.getName();
         course.setUser(userService.getUser(logginuser));
         courseService.saveCourse(course);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.EDITED.toString());
+        log.setDescription("created a new course");
+        logService.saveLog(log);
 
         return "redirect:/course/list";
     }

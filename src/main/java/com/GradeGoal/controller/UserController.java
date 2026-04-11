@@ -1,6 +1,8 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
 import com.GradeGoal.model.Image;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.model.User;
 import com.GradeGoal.service.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +36,8 @@ public class UserController {
     private DegreeService degreeService;
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("profile")
     public String profile(Model model, Principal principal){
@@ -96,11 +100,21 @@ public class UserController {
                     log.info("image is being removed..........");
                     imageService.deleteImage(currentUser.getStudentNo());
                     currentUser.setImage(null);
+                    Log log = new Log();
+                    log.setUser(userService.getUser(principal.getName()));
+                    log.setAction(Action.DELETED.toString());
+                    log.setDescription("removed profile image");
+                    logService.saveLog(log);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }else {
                 log.info("image is being saved......");
+                Log log = new Log();
+                log.setUser(userService.getUser(principal.getName()));
+                log.setAction(Action.CREATED.toString());
+                log.setDescription("added profile image");
+                logService.saveLog(log);
                 currentUser.setImage(imageService.saveImage(profileImage,currentUser.getStudentNo()));
             }
             currentUser.setName(user.getName());
@@ -110,6 +124,11 @@ public class UserController {
 
             userService.saveUser(currentUser);
             log.info("user saved");
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.CREATED.toString());
+            log.setDescription("user saved");
+            logService.saveLog(log);
 
             return "redirect:/user/profile";
         } catch (Exception e) {
@@ -197,6 +216,13 @@ public class UserController {
             User currentuser = userService.getUser(username);
             currentuser.setPassword(passwordEncoder.encode(password));
             userService.saveUser(currentuser);
+
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.EDITED.toString());
+            log.setDescription("updated password");
+            logService.saveLog(log);
+
             return "redirect:/user/profile";
         } catch (Exception e) {
             model.addAttribute("error","something went wrong" + e.getMessage());
@@ -230,6 +256,13 @@ public class UserController {
 
         if(isValid){
             userService.deleteUser(userService.getUser(username));
+
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.DELETED.toString());
+            log.setDescription("user deleted");
+            logService.saveLog(log);
+
             return "redirect:/logout";
         }else{
             return "redirect:/user/profile";

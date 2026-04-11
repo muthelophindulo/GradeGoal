@@ -1,7 +1,11 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.model.Terms;
 import com.GradeGoal.repository.TermsRepository;
+import com.GradeGoal.service.LogService;
+import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +19,10 @@ public class TermsController {
 
     @Autowired
     private TermsRepository termsRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping("/terms")
     public String showTerms(Model model){
@@ -29,6 +37,12 @@ public class TermsController {
             t.setAccepted(true);
 
             if(termsRepository.save(t) != null){
+                Log log = new Log();
+                log.setUser(userService.getUser(principal.getName()));
+                log.setAction(Action.ACCEPTED.toString());
+                log.setDescription("accepted the terms and conditions");
+                logService.saveLog(log);
+
                 return "redirect:/privacy";
             }else{
                 return "redirect:/terms";
@@ -47,6 +61,11 @@ public class TermsController {
 
     @PostMapping("/accept-privacy")
     public String acceptPrivacy(Model model, Principal principal){
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.ACCEPTED.toString());
+        log.setDescription("accepted the privacy policy");
+        logService.saveLog(log);
         return "redirect:/dashboard";
     }
 }

@@ -1,8 +1,12 @@
 package com.GradeGoal.controller;
 
 import com.GradeGoal.Dto.AdminDto;
+import com.GradeGoal.Mapper.AdminMapper;
+import com.GradeGoal.model.Action;
 import com.GradeGoal.model.Admin;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.service.AdminService;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +23,8 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private LogService logService;
 
     @GetMapping({"/","/dashboard"})
     public String dashboard(Model model, Principal principal){
@@ -56,10 +62,18 @@ public class AdminController {
     }
 
     @PostMapping("/save")
-    public String saveAdmin(@ModelAttribute Admin admin){
+    public String saveAdmin(@ModelAttribute Admin admin,Principal principal){
+
         AdminDto admin1 = adminService.saveAdmin(admin);
 
         if(admin1 != null){
+
+            Log log = new Log();
+            log.setAdmin(AdminMapper.maptoAdmin(adminService.getAdminByAdminNo(principal.getName())));
+            log.setAction(Action.CREATED.toString());
+            log.setDescription("created a new admin");
+            logService.saveLog(log);
+
             return "redirect:/admin/admins";
         }
 

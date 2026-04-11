@@ -32,6 +32,8 @@ public class WebController {
     private ResendService resendService;
     @Autowired
     private TermsRepository termsRepository;
+    @Autowired
+    private LogService logService;
 
     @Autowired
     private AdminService adminService;
@@ -125,6 +127,7 @@ public class WebController {
 
             if(!emailExists){
                 redirectAttributes.addFlashAttribute("passwordResetSuccess", "If an account exists with this email, you will receive a password reset link shortly.");
+
                 return "redirect:/forgot-password";
             }else{
                 ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
@@ -142,6 +145,12 @@ public class WebController {
 
                 String url = "www.gradegoal.co.za/reset/" + rawToken;
                 resendService.sendResetEmail(url,email);
+
+                Log log = new Log();
+                log.setUser(userService.getByEmail(email));
+                log.setAction(Action.CREATED.toString());
+                log.setDescription("password reset link requested");
+                logService.saveLog(log);
 
                 return "redirect:/forgot-password";
 

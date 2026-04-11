@@ -1,11 +1,9 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
 import com.GradeGoal.model.Goal;
-import com.GradeGoal.service.AssessmentService;
-import com.GradeGoal.service.CourseService;
-import com.GradeGoal.service.GoalService;
-import com.GradeGoal.service.UserService;
-import lombok.extern.java.Log;
+import com.GradeGoal.model.Log;
+import com.GradeGoal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +21,8 @@ public class GoalController {
     private CourseService courseService;
     @Autowired
     private GoalService goalService;
+    @Autowired
+    private LogService logService;
 
     @Autowired
     private AssessmentService assessmentService;
@@ -54,6 +54,12 @@ public class GoalController {
         goal.setUser(userService.getUser(principal.getName()));
         goalService.save(goal);
 
+        com.GradeGoal.model.Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.CREATED.toString());
+        log.setDescription("created a new goal");
+        logService.saveLog(log);
+
         return "redirect:/goals/list";
     }
 
@@ -61,6 +67,12 @@ public class GoalController {
     public String updateGoal(@ModelAttribute Goal goal, Model model, Principal principal){
         goal.setUser(userService.getUser(principal.getName()));
         goalService.save(goal);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.EDITED.toString());
+        log.setDescription("edited a goal");
+        logService.saveLog(log);
 
         return "redirect:/goals/list";
     }
