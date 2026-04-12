@@ -20,13 +20,13 @@ public class ResetTokenService {
     }
 
     public ResetPasswordToken getToken(String token) throws Exception {
-        return isValid(hashToken(token));
+        return resetTokenRepository.findByToken(token);
     }
 
     private ResetPasswordToken isValid(String token) throws Exception {
         ResetPasswordToken resetPasswordToken = resetTokenRepository.findByToken(hashToken(token));
 
-        if(resetPasswordToken.getExpiry_date().isBefore(LocalDateTime.now())){
+        if(LocalDateTime.now().isAfter(resetPasswordToken.getExpiry_date())){
             resetPasswordToken.setUsed(true);
             save(resetPasswordToken);
         }
@@ -41,8 +41,8 @@ public class ResetTokenService {
         //get the hashed token from the database
         ResetPasswordToken resetPasswordToken = resetTokenRepository.findByToken(hashedInput);
 
-        if(resetPasswordToken!= null){ //if resetPasswordToken is null it means it does not exist or the user entered an invalid token
-            if(resetPasswordToken.getExpiry_date().isBefore(LocalDateTime.now())){
+        if(resetPasswordToken != null){ //if resetPasswordToken is null it means it does not exist or the user entered an invalid token
+            if(LocalDateTime.now().isAfter(resetPasswordToken.getExpiry_date())){
                 resetPasswordToken.setUsed(true);
                 save(resetPasswordToken);
             }
