@@ -58,7 +58,7 @@ public class ResetPasswordController {
         if(!password.equals(confirmPassword)){
             model.addAttribute("error","new password does not equal confirm password");
             model.addAttribute("user",userService.getUser(username));
-            return "user/changePass";
+            return "resetPassword/form";
         }
 
         try {
@@ -70,7 +70,7 @@ public class ResetPasswordController {
             userService.saveUser(currentuser);
 
             Log log = new Log();
-            log.setUser(userService.getUser(principal.getName()));
+            log.setUser(user);
             log.setAction(Action.EDITED.toString());
             log.setDescription("updated password");
             logService.saveLog(log);
@@ -79,7 +79,7 @@ public class ResetPasswordController {
         } catch (Exception e) {
             model.addAttribute("error","something went wrong" + e.getMessage());
             model.addAttribute("user",userService.getUser(username));
-            return "user/changePass";
+            return "resetPassword/form";
         }
 
     }
