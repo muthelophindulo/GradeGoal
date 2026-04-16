@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/swagger-ui/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN","OWNER")
+                        .requestMatchers("/admin/admins").hasRole("OWNER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

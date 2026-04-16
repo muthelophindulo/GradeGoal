@@ -9,8 +9,6 @@ class GradeGoalApplicationTests {
 
 	@Test
 	void contextLoads() {
-		UserService userService = new UserService();
-		System.out.println(userService.yearOfStudy("225004680"));
 	}
 
 }

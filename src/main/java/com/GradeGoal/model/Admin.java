@@ -43,4 +43,8 @@ public class Admin {
     @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     @ToString.Exclude
     private List<Log> log;
+
+    @OneToMany(mappedBy = "admin",fetch = FetchType.LAZY,orphanRemoval = true,cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<ResetPasswordToken> tokens;
 }

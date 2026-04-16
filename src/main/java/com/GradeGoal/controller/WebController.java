@@ -1,6 +1,5 @@
 package com.GradeGoal.controller;
 
-import com.GradeGoal.Dto.AdminDto;
 import com.GradeGoal.model.*;
 import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.*;
@@ -43,6 +42,7 @@ public class WebController {
 
 
         String loggedInUser = principal.getName();
+        //System.out.println(userService.getUser(loggedInUser).getTokens());
 
         if(adminService.getAdminByAdminNo(principal.getName()) != null){
             //admin
@@ -51,7 +51,7 @@ public class WebController {
             //stats
             model.addAttribute("totalCourses",courseService.countTotalCourses());
             model.addAttribute("totalAssessments",assessmentService.countTotalAssessments());
-            model.addAttribute("totalUsers",adminService.CountUsers());
+            model.addAttribute("totalUsers",userService.countUsers());
 
             model.addAttribute("users",userService.getUsers());
 
@@ -123,7 +123,10 @@ public class WebController {
             RedirectAttributes redirectAttributes
     ){
         try{
-            boolean emailExists = userService.getByEmail(email) != null;
+            /*
+            * check if the email exists in both the users and admin table
+            * */
+            boolean emailExists = resetTokenService.emailExists(email);
 
             if(!emailExists){
                 redirectAttributes.addFlashAttribute("passwordResetSuccess", "If an account exists with this email, you will receive a password reset link shortly.");
@@ -133,9 +136,18 @@ public class WebController {
                 ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
 
                 String rawToken = UUID.randomUUID().toString();
+                Log log = new Log();
+                /*
+                * we have to know where the email exists from so that we can set the right owner
+                * */
+                if(userService.getByEmail(email) != null){
+                    resetPasswordToken.setUser(userService.getByEmail(email));
+                    log.setUser(userService.getByEmail(email));
+                }else{
+                    resetPasswordToken.setAdmin(adminService.getAdmin(adminService.getByEmail(email).getAdminNo()));
+                    log.setAdmin(adminService.getAdmin(adminService.getByEmail(email).getAdminNo()));
+                }
 
-
-                resetPasswordToken.setUser(userService.getByEmail(email));
                 resetPasswordToken.setToken(resetTokenService.hashToken(rawToken));
                 resetPasswordToken.setExpiry_date(LocalDateTime.now().plusHours(24));
 
@@ -146,8 +158,8 @@ public class WebController {
                 String url = "www.gradegoal.co.za/reset/" + rawToken;
                 resendService.sendResetEmail(url,email);
 
-                Log log = new Log();
-                log.setUser(userService.getByEmail(email));
+
+
                 log.setAction(Action.CREATED.toString());
                 log.setDescription("password reset link requested");
                 logService.saveLog(log);

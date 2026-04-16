@@ -28,6 +28,10 @@ public class ResetPasswordToken {
     private boolean used;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_no", referencedColumnName = "studentNo", nullable = false)
+    @JoinColumn(name = "student_no", referencedColumnName = "studentNo", nullable = true)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_no", referencedColumnName = "adminNo", nullable = true)
+    private Admin admin;
 }

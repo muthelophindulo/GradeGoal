@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>GradeGoal | Add Administrator</title>
+    <title>GradeGoal | Administrators</title>
 
     <!-- Bootstrap 5 + Icons + Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -26,6 +26,7 @@
             padding-top: 82px;
             overflow-x: hidden;
         }
+        /* Fixed Header */
         .admin-header {
             position: fixed;
             top: 0;
@@ -60,6 +61,7 @@
             font-weight: 600;
             overflow: hidden;
         }
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -70,6 +72,7 @@
             color: #e2e8f0;
             transition: all 0.3s;
             z-index: 1000;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.05);
             overflow-y: auto;
         }
         .sidebar-header {
@@ -111,59 +114,68 @@
             padding: 28px 32px;
             transition: 0.3s;
         }
-        .form-card {
-            max-width: 680px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            border: 1px solid #eef2ff;
-            overflow: hidden;
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
-        .form-header {
-            background: linear-gradient(105deg, #1e293b 0%, #0f172a 100%);
-            padding: 1.5rem 2rem;
-            color: white;
-        }
-        .form-header h2 {
+        .page-header h1 {
             font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        .form-body {
-            padding: 2rem;
-        }
-        .form-label {
-            font-weight: 600;
             color: #1e293b;
-            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .form-control, .form-select {
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            padding: 0.7rem 1rem;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-        }
-        .btn-primary {
+        .btn-add {
             background: #1e293b;
             border: none;
             border-radius: 40px;
-            padding: 0.7rem 1.8rem;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-add:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+        }
+        .card-table {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid #eef2ff;
+            overflow: hidden;
+        }
+        .table-admin th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        .table-admin td {
+            vertical-align: middle;
+            padding: 1rem;
+        }
+        .badge-role {
+            background: #eef2ff;
+            color: #1e293b;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
-        .btn-primary:hover {
-            background: #0f172a;
-        }
-        .btn-outline-secondary {
-            border-radius: 40px;
-            padding: 0.7rem 1.8rem;
-        }
-        .password-hint {
-            font-size: 0.75rem;
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
             color: #64748b;
-            margin-top: 0.25rem;
+        }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
         }
         @media (max-width: 992px) {
             .admin-header { left: 0; }
@@ -174,15 +186,14 @@
             .close-sidebar { display: block; }
             body { padding-top: 70px; }
         }
-        @media (max-width: 576px) {
-            .form-body { padding: 1.5rem; }
-            .form-header { padding: 1.2rem 1.5rem; }
+        @media (max-width: 768px) {
+            .table-admin th, .table-admin td { padding: 0.75rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- SIDEBAR (same as dashboard) -->
+<!-- SIDEBAR -->
 <nav class="sidebar" id="adminSidebar">
     <div class="sidebar-header">
         <h3><i class="bi bi-shield-check"></i> GradeGoal</h3>
@@ -219,52 +230,68 @@
 
 <!-- MAIN CONTENT -->
 <div class="main-content">
-    <div class="form-card">
-        <div class="form-header">
-            <h2><i class="bi bi-shield-lock-fill me-2"></i> Add Administrator</h2>
-            <p>Grant platform maintenance access to a new team member</p>
+    <div class="page-header">
+        <h1><i class="bi bi-shield-lock-fill"></i> Users</h1>
+        <a th:href="@{/admin/add-user}" class="btn btn-add text-white">
+            <i class="bi bi-person-plus-fill me-1"></i> Add User
+        </a>
+    </div>
+
+    <!-- Flash messages -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Admin List Card -->
+    <div class="card-table">
+        <div class="table-responsive">
+            <table class="table table-admin mb-0">
+                <thead>
+                    <tr>
+                        <th>StudentNo</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="adminUser : ${users}">
+                        <td th:text="${adminUser.studentNo}">1</td>
+                        <td class="fw-semibold" th:text="${adminUser.name}">Alex Morgan</td>
+                        <td th:text="${adminUser.email}">alex@gradegoal.com</td>
+                        <td>
+                            <form th:action="@{/admin/admins/view/{studentNo}(studentNo=${adminUser.studentNo})}" method="get" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" th:disabled="${adminUser.studentNo == currentAdminId}">
+                                    <i class="bi bi-person"></i> View
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${admins == null or admins.isEmpty()}">
+                        <td colspan="7" class="empty-state">
+                            <i class="bi bi-shield-slash fs-1"></i>
+                            <p class="mt-2 mb-0">No users found.</p>
+                            <small>Click "Add user" to create the first one.</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="form-body">
-            <!-- Flash messages -->
-            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+    </div>
 
-            <form th:action="@{/admin/save}" method="post" th:object="${admin}" id="addAdminForm">
-
-                <div class="mb-4">
-                    <label class="form-label"><i class="bi bi-person-badge me-1"></i> Full Name *</label>
-                    <input type="text" class="form-control" th:field="*{name}" placeholder="e.g., Sarah Johnson" required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label"><i class="bi bi-envelope me-1"></i> Email Address *</label>
-                    <input type="email" class="form-control" th:field="*{email}" placeholder="admin@gradegoal.com" required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label"><i class="bi bi-tag me-1"></i> Role</label>
-                    <select class="form-select" th:field="*{role}">
-                        <option value="ADMIN">Administrator (full access)</option>
-                        </select>
-                </div>
-
-                <div class="d-flex flex-wrap gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Create Admin</button>
-                    <a th:href="@{/admin/admins}" class="btn btn-outline-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
+    <div class="footer">
+        <p>© 2026 GradeGoal · user management · Only trusted personnel should be added.</p>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Sidebar toggle (same as dashboard)
     const menuBtn = document.getElementById('menuToggleBtn');
     const closeBtn = document.getElementById('closeSidebarBtn');
     const sidebar = document.getElementById('adminSidebar');

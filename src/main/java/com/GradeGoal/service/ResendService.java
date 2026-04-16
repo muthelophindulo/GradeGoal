@@ -64,4 +64,20 @@ public class ResendService {
             System.out.println("error sending email");
         }
     }
+
+    public void sendLoginDetailsEmail(String recipientEmail, String password, String username){
+        String html = templateService.generateCredentialsTemplate(userService.getByEmail(recipientEmail).getName(),username,password);
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from(fromEmail)
+                .to(recipientEmail)
+                .subject("Login Credentials")
+                .html(html)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(params);
+        } catch (Exception e) {
+            System.out.println("error sending email");
+        }
+    }
 }

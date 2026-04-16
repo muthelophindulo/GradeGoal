@@ -1,6 +1,9 @@
 package com.GradeGoal.service;
 
+import com.GradeGoal.Dto.AdminDto;
+import com.GradeGoal.model.Admin;
 import com.GradeGoal.model.ResetPasswordToken;
+import com.GradeGoal.model.User;
 import com.GradeGoal.repository.ResetTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,10 @@ import java.util.HexFormat;
 public class ResetTokenService {
     @Autowired
     private ResetTokenRepository resetTokenRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private AdminService adminService;
 
     public ResetPasswordToken save(ResetPasswordToken token){
         return resetTokenRepository.save(token);
@@ -60,5 +67,19 @@ public class ResetTokenService {
         }catch (Exception e){
             throw new Exception(e);
         }
+    }
+
+    /*
+    * this method will be used to check if an email exists in both admin and user's table
+    * */
+    public boolean emailExists(String email){
+        AdminDto admin_email = adminService.getByEmail(email);
+        User user_email = userService.getByEmail(email);
+
+        if(admin_email != null || user_email != null){ // this means the email exists in one of the two tables
+            return true; //to show that the email exists
+        }
+
+        return false; // if it doesnt
     }
 }
