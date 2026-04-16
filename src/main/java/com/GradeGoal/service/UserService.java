@@ -6,16 +6,18 @@ import com.GradeGoal.model.Course;
 import com.GradeGoal.model.User;
 import com.GradeGoal.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public User getById(Long id){
         return userRepository.getReferenceById(id);
@@ -39,7 +41,7 @@ public class UserService {
     }
 
     public List<UserDto> getUsers(){
-        return UserMapper.mapToDtos(userRepository.findAll());
+        return userMapper.toDtos(userRepository.findAll());
     }
 
     public double AverageGrade(String studNo){
@@ -93,6 +95,10 @@ public class UserService {
         int regYear = Integer.parseInt("20"+studNo.substring(1,3));
 
         return regYear + duration;
+    }
+
+    public int countUsers(){
+        return userRepository.findAll().size();
     }
 
 

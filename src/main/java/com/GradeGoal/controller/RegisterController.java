@@ -66,7 +66,7 @@ public class RegisterController {
 
             // Save user
             user.setPassword(passwordEncoder.encode(user.getPassword()) );
-            System.out.println(user.getDegree().getCode());
+            //System.out.println(user.getDegree().getCode());
             userService.saveUser(user);
 
             redirectAttributes.addFlashAttribute("successMessage",

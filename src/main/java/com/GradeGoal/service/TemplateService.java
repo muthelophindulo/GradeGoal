@@ -33,4 +33,14 @@ public class TemplateService {
 
         return processTemplate("email/welcome",context);
     }
+
+    public String generateCredentialsTemplate(String userName, String username, String password){
+        Context context = new Context();
+
+        context.setVariable("userName",userName);
+        context.setVariable("username",username);
+        context.setVariable("password",password);
+
+        return processTemplate("email/logInCredentials",context);
+    }
 }
