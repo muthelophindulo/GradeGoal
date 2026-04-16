@@ -56,6 +56,8 @@ public class UserService {
             average += x.getActualMark();
         }
 
+        average = courses.stream().mapToDouble(Course::getActualMark).sum();
+
         return Math.round(average / courses.size());
 
     }

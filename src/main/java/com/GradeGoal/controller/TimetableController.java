@@ -1,8 +1,11 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.model.Action;
+import com.GradeGoal.model.Log;
 import com.GradeGoal.model.TimeTable;
 import com.GradeGoal.model.User;
 import com.GradeGoal.repository.TimetableRepository;
+import com.GradeGoal.service.LogService;
 import com.GradeGoal.service.TimetableService;
 import com.GradeGoal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class TimetableController {
     private TimetableRepository repository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private LogService logService;
 
 
     // Predefined lists for days and times – now in controller
@@ -90,6 +95,13 @@ public class TimetableController {
             User user = userService.getUser(principal.getName());
             timetable.setUser(user);
             repository.save(timetable);
+
+            Log log = new Log();
+            log.setUser(userService.getUser(principal.getName()));
+            log.setAction(Action.CREATED.toString());
+            log.setDescription("added a timetable entry");
+            logService.saveLog(log);
+
             redirectAttributes.addFlashAttribute("successMessage", "Class added successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Slot already occupied or invalid data!");
@@ -110,6 +122,13 @@ public class TimetableController {
         Integer year = entry.getAcademicYear();
         Integer semester = entry.getSemester();
         repository.deleteById(id);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.DELETED.toString());
+        log.setDescription("deleted timetable entry");
+        logService.saveLog(log);
+
         return "redirect:/timetable/view?year=" + year + "&semester=" + semester;
     }
 
@@ -136,6 +155,13 @@ public class TimetableController {
 
         timeTable.setUser(userService.getUser(principal.getName()));
         repository.save(timeTable);
+
+        Log log = new Log();
+        log.setUser(userService.getUser(principal.getName()));
+        log.setAction(Action.EDITED.toString());
+        log.setDescription("updated a timetable entry");
+        logService.saveLog(log);
+
         redirectAttributes.addFlashAttribute("successMessage","successfully edited entry");
         return "redirect:/timetable/view";
     }

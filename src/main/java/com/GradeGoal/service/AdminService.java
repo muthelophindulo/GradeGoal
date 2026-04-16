@@ -56,6 +56,10 @@ public class AdminService {
         return adminMapper.toDto(adminRepository.findByName(name));
     }
 
+    public Admin getAdmin(String adminNo){
+        return adminRepository.findByAdminNo(adminNo);
+    }
+
     public List<AdminDto> getAdmins(){
         return adminMapper.toDtos(adminRepository.findAll());
     }
