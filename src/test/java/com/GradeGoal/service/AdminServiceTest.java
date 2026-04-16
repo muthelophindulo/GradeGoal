@@ -90,7 +90,5 @@ class AdminServiceTest {
     }
     @Test
     void createUser(){
-        when(adminRepository.save(any(Admin.class))).thenReturn(admin);
-
     }
 }
