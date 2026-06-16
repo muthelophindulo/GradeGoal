@@ -35,6 +35,9 @@ public class Admin {
     @Column
     private String role;
 
+    @Column(name = "first_log_in")
+    private boolean firstLogIn;
+
     @OneToOne(mappedBy = "admin", cascade = CascadeType.ALL, optional = false,fetch = FetchType.LAZY,orphanRemoval = true)
     @JoinColumn(referencedColumnName = "id", name = "image_id")
     @ToString.Exclude

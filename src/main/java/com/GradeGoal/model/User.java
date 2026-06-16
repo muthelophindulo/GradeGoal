@@ -41,6 +41,9 @@ public class User {
     @Column(nullable = false,columnDefinition = "integer default 1" )
     private int selectedSemester;
 
+    @Column(name = "first_log_in")
+    private boolean firstLogIn;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Course> courses;
