@@ -6,6 +6,7 @@ import com.GradeGoal.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -124,7 +125,7 @@ public class CourseService {
         return userService.getUser(user).getCourses()
                 .stream()
                 .filter(course -> course
-                        .getYear() == userService.getUser(user).getSelectedYear())
+                        .getYear() == userService.getUser(user).getSelectedYear() && course.getSemester() == getSemester())
                 .toList();
     }
 
@@ -167,5 +168,12 @@ public class CourseService {
 
     public int countTotalCourses(){
         return courseRepository.findAll().size();
+    }
+
+    public int getSemester(){
+        if(LocalDate.now().getMonthValue() >= 7){
+            return 2;
+        }
+        return 1;
     }
 }
