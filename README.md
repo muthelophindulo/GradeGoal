@@ -1,6 +1,6 @@
 # GradeGoal
 ![Alt text](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Alt text](https://img.shields.io/badge/Version-V1.2.2-green.svg)
+![Alt text](https://img.shields.io/badge/Version-V1.2.5-green.svg)
 
 A web application that helps students set academic goals, track grades, and calculate what's needed to achieve target scores.
 
