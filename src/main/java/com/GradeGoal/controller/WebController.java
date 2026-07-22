@@ -1,8 +1,11 @@
 package com.GradeGoal.controller;
 
+import com.GradeGoal.Dto.AdminDto;
+import com.GradeGoal.Mapper.AdminMapper;
 import com.GradeGoal.model.*;
 import com.GradeGoal.repository.TermsRepository;
 import com.GradeGoal.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Controller
+@RequiredArgsConstructor
 public class WebController {
 
     @Autowired
@@ -36,15 +40,20 @@ public class WebController {
 
     @Autowired
     private AdminService adminService;
+    private final AdminMapper adminMapper;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model,Principal principal){
 
 
         String loggedInUser = principal.getName();
-        //System.out.println(userService.getUser(loggedInUser).getTokens());
+        AdminDto admin = adminService.getAdminByAdminNo(principal.getName());
+        
 
-        if(adminService.getAdminByAdminNo(principal.getName()) != null){
+        if( admin != null){
+            if(adminMapper.toEntity(admin).isFirstLogIn()){
+                return "redirect/admin/change-password";
+            }
             //admin
             model.addAttribute("admin",adminService.getAdminByAdminNo(principal.getName()));
 

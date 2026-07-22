@@ -112,7 +112,7 @@ public class AssessmentService {
                 .stream()
                 .filter(assessment -> assessment
                         .getDate()
-                        .getYear() == userService.getUser(user).getSelectedYear())
+                        .getYear() == userService.getUser(user).getSelectedYear() && assessment.getCourse().getSemester() == getSemester())
                 .toList()
                 .stream()
                 .sorted(Comparator.comparing(Assessment::getDate))
@@ -123,4 +123,10 @@ public class AssessmentService {
         return assessmentRepository.findAll().size();
     }
 
+    public int getSemester(){
+        if(LocalDate.now().getMonthValue() >= 7){
+            return 2;
+        }
+        return 1;
+    }
 }
